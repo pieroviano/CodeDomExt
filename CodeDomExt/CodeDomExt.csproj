@@ -1,0 +1,132 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{FFAC55C2-6BA9-41D7-8E36-5298C1B5D24B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>CodeDomExt</RootNamespace>
+    <AssemblyName>CodeDomExt</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <LangVersion>7.2</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\CodeDomExt.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Collections.Immutable, Version=1.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <HintPath>..\..\..\..\..\Program Files\JetBrains\JetBrains Rider 2018.1\lib\ReSharperHost\System.Collections.Immutable.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Generators\CodeGeneratorFactory.cs" />
+    <Compile Include="Generators\ChainOfResponsibilityHandlerCodeGenerator.cs" />
+    <Compile Include="Generators\Common\DefaultAttributeDeclarationHandler.cs" />
+    <Compile Include="Generators\Common\DefaultCommentHandler.cs" />
+    <Compile Include="Generators\Common\DefaultExpressionHandler.cs" />
+    <Compile Include="Generators\Common\DefaultMemberAttributesHandler.cs" />
+    <Compile Include="Generators\Common\DefaultNamespaceHandler.cs" />
+    <Compile Include="Generators\Common\DefaultStatementHandler.cs" />
+    <Compile Include="Generators\Common\DefaultTypeAttributesHandler.cs" />
+    <Compile Include="Generators\Common\DefaultTypeDeclarationHandler.cs" />
+    <Compile Include="Generators\Common\DefaultTypeMemberHandler.cs" />
+    <Compile Include="Generators\Common\DefaultTypeReferenceHandler.cs" />
+    <Compile Include="Generators\Common\PrimitiveExpressionHandler.cs" />
+    <Compile Include="Generators\ConsistencyException.cs" />
+    <Compile Include="Generators\Csharp\CSharpContext.cs" />
+    <Compile Include="Generators\Csharp\CSharpUtils.cs" />
+    <Compile Include="Generators\Csharp\DefaultAttributeDeclarationHandler.cs" />
+    <Compile Include="Generators\Csharp\DefaultCommentHandler.cs" />
+    <Compile Include="Generators\Csharp\DefaultCompileUnitHandler.cs" />
+    <Compile Include="Generators\Csharp\DefaultStatementHandler.cs" />
+    <Compile Include="Generators\Csharp\DefaultTypeParameterHandler.cs" />
+    <Compile Include="Generators\Csharp\DefaultExpressionHandler.cs" />
+    <Compile Include="Generators\Csharp\DefaultMemberAttributesHandler.cs" />
+    <Compile Include="Generators\Csharp\DefaultNamespaceHandler.cs" />
+    <Compile Include="Generators\Csharp\DefaultNamespaceImportHandler.cs" />
+    <Compile Include="Generators\Csharp\DefaultTypeDeclarationHandler.cs" />
+    <Compile Include="Generators\Csharp\DefaultTypeAttributesHandler.cs" />
+    <Compile Include="Generators\Csharp\DefaultTypeMemberHandler.cs" />
+    <Compile Include="Generators\Csharp\DefaultTypeReferenceHandler.cs" />
+    <Compile Include="Generators\Csharp\CSharpKeywordsUtils.cs" />
+    <Compile Include="Generators\DynamicDispatchHandler.cs" />
+    <Compile Include="Generators\ICodeHandlerProvider.cs" />
+    <Compile Include="Generators\CodeGenerator.cs" />
+    <Compile Include="Generators\ChainOfResponsibilityHandler.cs" />
+    <Compile Include="Generators\Context.cs" />
+    <Compile Include="Generators\ICodeObjectHandler.cs" />
+    <Compile Include="Generators\ICodeWriter.cs" />
+    <Compile Include="Generators\ObjectUnhandledException.cs" />
+    <Compile Include="Generators\GeneratorOptions.cs" />
+    <Compile Include="Generators\VisualBasic\DefaultAttributeDeclarationHandler.cs" />
+    <Compile Include="Generators\VisualBasic\DefaultCommentHandler.cs" />
+    <Compile Include="Generators\VisualBasic\DefaultCompileUnitHandler.cs" />
+    <Compile Include="Generators\VisualBasic\DefaultExpressionHandler.cs" />
+    <Compile Include="Generators\VisualBasic\DefaultMemberAttributesHandler.cs" />
+    <Compile Include="Generators\VisualBasic\DefaultNamespaceHandler.cs" />
+    <Compile Include="Generators\VisualBasic\DefaultNamespaceImportHandler.cs" />
+    <Compile Include="Generators\VisualBasic\DefaultStatementHandler.cs" />
+    <Compile Include="Generators\VisualBasic\DefaultTypeAttributesHandler.cs" />
+    <Compile Include="Generators\VisualBasic\DefaultTypeDeclarationHandler.cs" />
+    <Compile Include="Generators\VisualBasic\DefaultTypeMemberHandler.cs" />
+    <Compile Include="Generators\VisualBasic\DefaultTypeParameterHandler.cs" />
+    <Compile Include="Generators\VisualBasic\DefaultTypeReferenceHandler.cs" />
+    <Compile Include="Generators\VisualBasic\VisualBasicKeywordsUtils.cs" />
+    <Compile Include="Generators\VisualBasic\VisualBasicUtils.cs" />
+    <Compile Include="Generators\VisualBasic\VisualBasicContext.cs" />
+    <Compile Include="Nodes\CodeBreakStatement.cs" />
+    <Compile Include="Nodes\CodeForEachStatement.cs" />
+    <Compile Include="Nodes\CodeLambdaDeclarationExpression.cs" />
+    <Compile Include="Nodes\CodeMultidimensionalArrayCreateExpression.cs" />
+    <Compile Include="Nodes\CodeObjectCreateExpressionExt.cs" />
+    <Compile Include="Nodes\CodeOperationAssignmentStatement.cs" />
+    <Compile Include="Nodes\CodeBinaryOperatorExpressionMore.cs" />
+    <Compile Include="Nodes\CodeConditionalOperatorExpression.cs" />
+    <Compile Include="Nodes\CodeMemberPropertyExt.cs" />
+    <Compile Include="Nodes\CodeParameterDeclarationExpressionExt.cs" />
+    <Compile Include="Nodes\CodeTypeDeclarationExt.cs" />
+    <Compile Include="Nodes\CodeUnaryOperatorExpression.cs" />
+    <Compile Include="Nodes\CodePostTestIterationStatement.cs" />
+    <Compile Include="Nodes\CodeUsingStatement.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utils\CodeBinaryOperatorTypeMore.cs" />
+    <Compile Include="Utils\ConsistencyChecks.cs" />
+    <Compile Include="Utils\DeclarationType.cs" />
+    <Compile Include="Utils\GeneralUtils.cs" />
+    <Compile Include="Utils\Language.cs" />
+    <Compile Include="Utils\CodeUnaryOperatorType.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CodeDomExt.Helpers\CodeDomExt.Helpers.csproj">
+      <Project>{edbd661b-9c26-4281-bcb7-302f954f0923}</Project>
+      <Name>CodeDomExt.Helpers</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

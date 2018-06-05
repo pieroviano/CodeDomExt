@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>1.0.0</version>
+    <title>CodeDomExt Helpers</title>
+    <authors>Luca Tremamunno</authors>
+    <owners>$author$</owners>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
+    <projectUrl>https://github.com/tremaluca/CodeDomExt</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A collection of utilities to improve CodeDOM program building</description>
+    <releaseNotes>Version 1.0.0 released.</releaseNotes>
+    <copyright>Copyright 2018</copyright>
+    <tags>CodeDOM Utils</tags>
+  </metadata>
+</package>
