@@ -14,6 +14,13 @@ namespace CodeDomExt.Generators.Common
     /// </remarks>
     public abstract class DefaultExpressionHandler : DynamicDispatchHandler<CodeExpression>
     {
+        private readonly bool _handleSnippet;
+
+        protected DefaultExpressionHandler(bool handleSnippet = true)
+        {
+            _handleSnippet = handleSnippet;
+        }
+        
         /// <inheritdoc />
         protected override bool DoDynamicHandle(CodeExpression obj, Context ctx)
         {
@@ -173,6 +180,7 @@ namespace CodeDomExt.Generators.Common
 
         private bool HandleDynamic(CodeSnippetExpression obj, Context ctx)
         {
+            if (!_handleSnippet) return false;
             GeneralUtils.HandleSnippet(obj.Value, ctx);
             return true;
         }

@@ -101,14 +101,7 @@ namespace CodeDomExt.Generators.VisualBasic
                 BeginBlock((BlockType) blockType, ctx);
             }
             GeneralUtils.HandleCollection(coll.Cast<CodeStatement>(), ctx.HandlerProvider.StatementHandler, ctx,
-                preAction: (c) => c.Writer.Indent(c),
-                postAction: (c) =>
-                {
-                    if (c.StatementNeedsTermination)
-                    {
-                        c.Writer.NewLine();
-                    }
-                }, doPostActionOnLast: true);
+                preAction: (c) => c.Writer.Indent(c));
             if (blockType != null)
             {
                 EndBlock(ctx);

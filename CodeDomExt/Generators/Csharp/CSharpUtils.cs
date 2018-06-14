@@ -16,7 +16,7 @@ namespace CodeDomExt.Generators.Csharp
         /// <param name="ctx"></param>
         /// <param name="doBlockAndIndentation">If true will also output indentation and {}</param>
         public static void HandleStatementCollection(CodeStatementCollection coll, Context ctx, bool doBlockAndIndentation = true)
-        {
+        { 
             if (doBlockAndIndentation)
             {
                 ctx.Writer.NewLine();
@@ -25,14 +25,7 @@ namespace CodeDomExt.Generators.Csharp
             }
             GeneralUtils.HandleCollection(coll.Cast<CodeStatement>(),
                 ctx.HandlerProvider.StatementHandler, ctx,
-                preAction: (c) => c.Writer.Indent(c),
-                postAction: (c) =>
-                {
-                    if (c.StatementNeedsTermination)
-                    {
-                        c.Writer.WriteLine(";");
-                    }
-                }, doPostActionOnLast: true);
+                preAction: (c) => c.Writer.Indent(c));
             if (doBlockAndIndentation)
             {
                 ctx.Unindent();

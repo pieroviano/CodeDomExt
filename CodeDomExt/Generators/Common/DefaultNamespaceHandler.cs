@@ -4,7 +4,7 @@ namespace CodeDomExt.Generators.Common
 {
     /// <summary>
     /// A partial namespace handler, only handling namespace comments generation, leaving the actual namespace handling
-    /// to subclasses
+    /// to the implementing class
     /// </summary>
     /// <remarks>
     /// A namespace handler should handle the imports only if the target language supports namespace specific imports,
@@ -21,11 +21,12 @@ namespace CodeDomExt.Generators.Common
                 ctx.HandlerProvider.StatementHandler.Handle(comment, ctx);
                 ctx.Writer.Indent(ctx);
             }
-
-            return DoHandle(obj, ctx);
+            //since i'm already doing some handling DoHandle must handle the rest of the namespace
+            DoHandle(obj, ctx);
+            return true;
         }
 
         /// <inheritdoc cref="Handle"/>
-        protected abstract bool DoHandle(CodeNamespace obj, Context ctx);
+        protected abstract void DoHandle(CodeNamespace obj, Context ctx);
     }
 }

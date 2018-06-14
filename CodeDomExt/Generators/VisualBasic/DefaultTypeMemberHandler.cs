@@ -9,9 +9,10 @@ namespace CodeDomExt.Generators.VisualBasic
     /// <inheritdoc />
     public class DefaultTypeMemberHandler : Common.DefaultTypeMemberHandler
     {
+        protected override bool CanHandleEvent => true;
 
         /// <inheritdoc />
-        protected override bool HandleEvent(CodeMemberEvent obj, Context ctx)
+        protected override void HandleEvent(CodeMemberEvent obj, Context ctx)
         {
             if (GeneralUtils.IsNullOrVoidType(obj.PrivateImplementationType))
             {
@@ -31,10 +32,12 @@ namespace CodeDomExt.Generators.VisualBasic
             HandleImplementationTypes(obj.ImplementationTypes, obj.Name, ctx);
             HandlePrivateImplType(obj.PrivateImplementationType, obj.Name, ctx);
             ctx.Writer.NewLine();
-            return true;
         }
+
+        protected override bool CanHandleProperty => true;
+
         /// <inheritdoc />
-        protected override bool HandleProperty(CodeMemberProperty obj, Context ctx, bool isExt, 
+        protected override void HandleProperty(CodeMemberProperty obj, Context ctx, bool isExt, 
             CodeMemberPropertyExt objExt, bool doDefaultImplementation)
         {
 
@@ -112,10 +115,12 @@ namespace CodeDomExt.Generators.VisualBasic
                 
                 VisualBasicUtils.EndBlock(ctx);
             }
-            return true;
         }
+
+        protected override bool CanHandleField => true;
+
         /// <inheritdoc />
-        protected override bool HandleField(CodeMemberField obj, Context ctx)
+        protected override void HandleField(CodeMemberField obj, Context ctx)
         {
             if (ctx.CurrentDeclarationType == DeclarationType.Enum)
             {
@@ -138,9 +143,9 @@ namespace CodeDomExt.Generators.VisualBasic
             {
                 ctx.Writer.NewLine();
             }
-            
-            return true;
         }
+
+        protected override bool CanHandleMethod => true;
 
 
         private void HandleMethodParameters(CodeMemberMethod obj, Context ctx)
@@ -156,7 +161,7 @@ namespace CodeDomExt.Generators.VisualBasic
             VisualBasicUtils.HandleStatementCollection(obj.Statements, ctx, isSub ? BlockType.Sub : BlockType.Function);
         }
         /// <inheritdoc />
-        protected override bool HandleMethod(CodeMemberMethod obj, Context ctx)
+        protected override void HandleMethod(CodeMemberMethod obj, Context ctx)
         {
             if (GeneralUtils.IsNullOrVoidType(obj.PrivateImplementationType))
             {
@@ -202,10 +207,12 @@ namespace CodeDomExt.Generators.VisualBasic
             {
                 ctx.Writer.NewLine();
             }
-            return true;
         }
+
+        protected override bool CanHandleConstructor => true;
+
         /// <inheritdoc />
-        protected override bool HandleConstructor(CodeConstructor obj, Context ctx)
+        protected override void HandleConstructor(CodeConstructor obj, Context ctx)
         {
             //no return type, only access modifier
             ctx.HandlerProvider.MemberAttributesHandler.Handle(obj.Attributes, ctx);
@@ -234,17 +241,21 @@ namespace CodeDomExt.Generators.VisualBasic
             }
             VisualBasicUtils.HandleStatementCollection(obj.Statements, ctx);
             VisualBasicUtils.EndBlock(ctx);
-            return true;
         }
+
+        protected override bool CanHandleTypeConstructor => true;
+
         /// <inheritdoc />
-        protected override bool HandleTypeConstructor(CodeTypeConstructor obj, Context ctx)
+        protected override void HandleTypeConstructor(CodeTypeConstructor obj, Context ctx)
         {
             ctx.Writer.Write("Shared Sub New()");
             HandleMethodStatements(obj, ctx, true);
-            return true;
         }
+
+        protected override bool CanHandleEntryPoint => true;
+
         /// <inheritdoc />
-        protected override bool HandleMain(CodeEntryPointMethod obj, Context ctx)
+        protected override void HandleMain(CodeEntryPointMethod obj, Context ctx)
         {
             ctx.Writer.Write("Public ");
             if (ctx.VisualBasic.CurrentBlockType != BlockType.Module)
@@ -262,7 +273,6 @@ namespace CodeDomExt.Generators.VisualBasic
             }
             
             HandleMethodStatements(obj, ctx, isSub);
-            return true;
         }
         
         private void HandleImplementationTypes(CodeTypeReferenceCollection implementationTypes, string name, Context ctx)

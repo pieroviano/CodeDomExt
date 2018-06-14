@@ -8,7 +8,7 @@ namespace CodeDomExt.Generators.VisualBasic
     public class DefaultNamespaceHandler : Common.DefaultNamespaceHandler
     {
         /// <inheritdoc />
-        protected override bool DoHandle(CodeNamespace obj, Context ctx)
+        protected override void DoHandle(CodeNamespace obj, Context ctx)
         {
             ctx.CurrentNamespace = obj.Name;
             ctx.Writer.Write($"Namespace {VisualBasicUtils.GetValidNamespaceIdentifier(ctx.CurrentNamespace)}");
@@ -17,7 +17,6 @@ namespace CodeDomExt.Generators.VisualBasic
                 preAction: (c) => c.Writer.Indent(c),
                 postAction: (c) => c.Writer.NewLine(), doPostActionOnLast: false);
             VisualBasicUtils.EndBlock(ctx);
-            return true;
         }
     }
 }

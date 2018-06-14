@@ -10,7 +10,7 @@ namespace CodeDomExt.Generators.VisualBasic
     public class DefaultTypeDeclarationHandler : Common.DefaultTypeDeclarationHandler
     {
         /// <inheritdoc />
-        protected override bool HandleTypeDeclaration(CodeTypeDeclaration obj, DeclarationType type, Context ctx)
+        protected override void HandleTypeDeclaration(CodeTypeDeclaration obj, DeclarationType type, Context ctx)
         {
             if (obj.IsPartial && (obj.IsStruct || obj.IsInterface || obj.IsClass))
             {
@@ -50,8 +50,13 @@ namespace CodeDomExt.Generators.VisualBasic
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+        }
 
-            return true;
+        /// <inheritdoc />
+        protected override bool CanHandle(DeclarationType type)
+        {
+            return type == DeclarationType.Class || type == DeclarationType.Delegate || type == DeclarationType.Enum ||
+                   type == DeclarationType.Interface || type == DeclarationType.Struct;
         }
 
         private void HandleClassOrStruct(CodeTypeDeclaration obj, Context ctx, bool isStruct)

@@ -70,7 +70,6 @@ namespace CodeDomExt.Generators.VisualBasic
         protected override bool HandleFor(CodeIterationStatement obj, Context ctx)
         {
             ctx.HandlerProvider.StatementHandler.Handle(obj.InitStatement, ctx);
-            ctx.Writer.NewLine();
             ctx.Writer.Indent(ctx);
             CodeIterationStatement equivalent = new CodeIterationStatement(null, obj.TestExpression, null);
             equivalent.Statements.AddRange(obj.Statements);
@@ -193,6 +192,12 @@ namespace CodeDomExt.Generators.VisualBasic
             ctx.Writer.Write(
                 $"Exit {ctx.VisualBasic.BlockTypeStack.First((blockType) => blockType.CanExit()).GetKeyword()}");
             return true;
+        }
+
+        /// <inheritdoc />
+        protected override void DoTermination(Context ctx)
+        {
+            ctx.Writer.NewLine();
         }
 
         private readonly CatchClauseHandler _catchClauseHandler = new CatchClauseHandler();

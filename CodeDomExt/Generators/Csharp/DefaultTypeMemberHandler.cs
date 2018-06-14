@@ -9,8 +9,10 @@ namespace CodeDomExt.Generators.Csharp
     /// <inheritdoc/>
     public class DefaultTypeMemberHandler : Common.DefaultTypeMemberHandler
     {
+        protected override bool CanHandleEvent => true;
+
         /// <inheritdoc/>
-        protected override bool HandleEvent(CodeMemberEvent obj, Context ctx)
+        protected override void HandleEvent(CodeMemberEvent obj, Context ctx)
         {
             if (obj.PrivateImplementationType == null)
             {
@@ -28,10 +30,12 @@ namespace CodeDomExt.Generators.Csharp
                 HandlePrivateImplementationTypeMemberName(obj.Name, obj.PrivateImplementationType, ctx);
             }
             ctx.Writer.WriteLine(";");
-            return true;
         }
+
+        protected override bool CanHandleProperty => true;
+
         /// <inheritdoc/>
-        protected override bool HandleProperty(CodeMemberProperty obj, Context ctx, 
+        protected override void HandleProperty(CodeMemberProperty obj, Context ctx, 
             bool isExt, CodeMemberPropertyExt objExt, bool doDefaultImplementation)
         {
             if (obj.PrivateImplementationType == null)
@@ -96,10 +100,12 @@ namespace CodeDomExt.Generators.Csharp
                 ctx.Writer.Write(";");
             }
             ctx.Writer.NewLine();
-            return true;
         }
+
+        protected override bool CanHandleField => true;
+
         /// <inheritdoc/>
-        protected override bool HandleField(CodeMemberField obj, Context ctx)
+        protected override void HandleField(CodeMemberField obj, Context ctx)
         {
             if (ctx.CurrentDeclarationType == DeclarationType.Enum)
             {
@@ -122,8 +128,9 @@ namespace CodeDomExt.Generators.Csharp
             {
                 ctx.Writer.WriteLine(";");
             }
-            return true;
         }
+
+        protected override bool CanHandleMethod => true;
 
         private void HandleMethodParameters(CodeMemberMethod obj, Context ctx)
         {
@@ -138,7 +145,7 @@ namespace CodeDomExt.Generators.Csharp
             CSharpUtils.HandleStatementCollection(obj.Statements, ctx);
         }
         /// <inheritdoc />
-        protected override bool HandleMethod(CodeMemberMethod obj, Context ctx)
+        protected override void HandleMethod(CodeMemberMethod obj, Context ctx)
         {
             if (GeneralUtils.IsNullOrVoidType(obj.PrivateImplementationType))
             {
@@ -184,10 +191,12 @@ namespace CodeDomExt.Generators.Csharp
             {
                 HandleMethodStatements(obj, ctx);
             }
-            return true;
         }
+
+        protected override bool CanHandleConstructor => true;
+
         /// <inheritdoc/>
-        protected override bool HandleConstructor(CodeConstructor obj, Context ctx)
+        protected override void HandleConstructor(CodeConstructor obj, Context ctx)
         {
             //no return type, only access modifier
             ctx.HandlerProvider.MemberAttributesHandler.Handle(obj.Attributes, ctx);
@@ -219,17 +228,21 @@ namespace CodeDomExt.Generators.Csharp
             }
 
             HandleMethodStatements(obj, ctx);
-            return true;
         }
+
+        protected override bool CanHandleTypeConstructor => true;
+
         /// <inheritdoc/>
-        protected override bool HandleTypeConstructor(CodeTypeConstructor obj, Context ctx)
+        protected override void HandleTypeConstructor(CodeTypeConstructor obj, Context ctx)
         {
             ctx.Writer.Write($"static {ctx.CurrentCodeTypeDeclaration.Name.AsCsId()}()");
             HandleMethodStatements(obj, ctx);
-            return true;
         }
+
+        protected override bool CanHandleEntryPoint => true;
+
         /// <inheritdoc/>
-        protected override bool HandleMain(CodeEntryPointMethod obj, Context ctx)
+        protected override void HandleMain(CodeEntryPointMethod obj, Context ctx)
         {
             ctx.HandlerProvider.MemberAttributesHandler.Handle(
                 GeneralUtils.GetMaskedMemberAttributes(obj.Attributes, true, false, false, true), ctx);
@@ -238,7 +251,6 @@ namespace CodeDomExt.Generators.Csharp
             ctx.HandlerProvider.TypeReferenceHandler.Handle(obj.ReturnType, ctx);
             ctx.Writer.Write(" Main(string[] args)");
             HandleMethodStatements(obj, ctx);
-            return true;
         }
         
         private void HandlePrivateImplementationTypeMemberName(string memberName, CodeTypeReference privateImplementationType,

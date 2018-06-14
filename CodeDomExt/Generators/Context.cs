@@ -49,11 +49,12 @@ namespace CodeDomExt.Generators
         /// The <see cref="MemberTypes"/> of the <see cref="CodeTypeMember"/> currently being handled
         /// </summary>
         public MemberTypes CurrentTypeMember => TypeMemberStack.Peek();
+
         /// <summary>
-        /// Set by statement handlers, true if the latest statement handled should be terminated by who requested handling
+        /// To be set before handling statements. If true the statement will halso handle its termination
         /// </summary>
         /// <seealso cref="CodeDomExt.Generators.Common.DefaultStatementHandler"/>
-        public bool StatementNeedsTermination { get; set; }
+        public bool StatementShouldTerminate { get; set; } = true;
         
         /// <summary>
         /// The namespaces currently imported names (not escaped)

@@ -49,6 +49,7 @@
     <Compile Include="Generators\ChainOfResponsibilityHandlerCodeGenerator.cs" />
     <Compile Include="Generators\Common\DefaultAttributeDeclarationHandler.cs" />
     <Compile Include="Generators\Common\DefaultCommentHandler.cs" />
+    <Compile Include="Generators\Common\DefaultDirectiveHandler.cs" />
     <Compile Include="Generators\Common\DefaultExpressionHandler.cs" />
     <Compile Include="Generators\Common\DefaultMemberAttributesHandler.cs" />
     <Compile Include="Generators\Common\DefaultNamespaceHandler.cs" />
@@ -64,6 +65,7 @@
     <Compile Include="Generators\Csharp\DefaultAttributeDeclarationHandler.cs" />
     <Compile Include="Generators\Csharp\DefaultCommentHandler.cs" />
     <Compile Include="Generators\Csharp\DefaultCompileUnitHandler.cs" />
+    <Compile Include="Generators\Csharp\DefaultDirectiveHandler.cs" />
     <Compile Include="Generators\Csharp\DefaultStatementHandler.cs" />
     <Compile Include="Generators\Csharp\DefaultTypeParameterHandler.cs" />
     <Compile Include="Generators\Csharp\DefaultExpressionHandler.cs" />
@@ -87,6 +89,7 @@
     <Compile Include="Generators\VisualBasic\DefaultAttributeDeclarationHandler.cs" />
     <Compile Include="Generators\VisualBasic\DefaultCommentHandler.cs" />
     <Compile Include="Generators\VisualBasic\DefaultCompileUnitHandler.cs" />
+    <Compile Include="Generators\VisualBasic\DefaultDirectiveHandler.cs" />
     <Compile Include="Generators\VisualBasic\DefaultExpressionHandler.cs" />
     <Compile Include="Generators\VisualBasic\DefaultMemberAttributesHandler.cs" />
     <Compile Include="Generators\VisualBasic\DefaultNamespaceHandler.cs" />

@@ -8,7 +8,7 @@ namespace CodeDomExt.Generators.Csharp
     public class DefaultNamespaceHandler : Common.DefaultNamespaceHandler
     {
         /// <inheritdoc/>
-        protected override bool DoHandle(CodeNamespace obj, Context ctx)
+        protected override void DoHandle(CodeNamespace obj, Context ctx)
         {
             ctx.CurrentNamespace = obj.Name;
             ctx.Writer.WriteLine($"namespace {CSharpUtils.GetValidNamespaceIdentifier(ctx.CurrentNamespace)}");
@@ -29,7 +29,6 @@ namespace CodeDomExt.Generators.Csharp
                 postAction: (c) => c.Writer.NewLine(), doPostActionOnLast: false);
             ctx.Unindent();
             ctx.Writer.WriteLine("}");
-            return true;
         }
     }
 }

@@ -16,23 +16,35 @@ namespace CodeDomExt.Generators.Common
     {
         /// <inheritdoc />
         public bool Handle(CodeTypeDeclaration obj, Context ctx)
-        {
+        {   
+            DeclarationType type = GeneralUtils.CheckAndGetDeclarationType(obj, ctx);
+
+            if (!CanHandle(type)) //since i'm going to do part of the generation i must make sure i can handle the whole object
+            {
+                return false;
+            }
+            
             foreach (CodeCommentStatement comment in obj.Comments)
             {
                 ctx.HandlerProvider.StatementHandler.Handle(comment, ctx);
                 ctx.Writer.Indent(ctx);
             }
             
-            DeclarationType type = GeneralUtils.CheckAndGetDeclarationType(obj, ctx);
             ctx.TypeDeclarationStack.Push(new Tuple<DeclarationType, CodeTypeDeclaration>(type, obj));
 
-            bool res = HandleTypeDeclaration(obj, type, ctx);
+            HandleTypeDeclaration(obj, type, ctx);
 
             ctx.TypeDeclarationStack.Pop();
-            return res;
+            return true;
         }
 
         /// <inheritdoc cref="ICodeObjectHandler{T}.Handle"/>
-        protected abstract bool HandleTypeDeclaration(CodeTypeDeclaration obj, DeclarationType type, Context ctx);
+        protected abstract void HandleTypeDeclaration(CodeTypeDeclaration obj, DeclarationType type, Context ctx);
+        /// <summary>
+        /// Returns true if the provided declaration type can be handled
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        protected abstract bool CanHandle(DeclarationType type);
     }
 }

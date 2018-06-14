@@ -34,6 +34,7 @@ namespace CodeDomExt.Generators
                     res.AddStatementHandler(new VisualBasic.DefaultStatementHandler());
                     res.AddCompileUnitHandler(new VisualBasic.DefaultCompileUnitHandler());
                     res.AddCommentHandler(new VisualBasic.DefaultCommentHandler());
+                    res.AddDirectiveHandler(new VisualBasic.DefaultDirectiveHandler());
                     break;
                 case Language.CSharp:
                     res.AddNamespaceHandler(new Csharp.DefaultNamespaceHandler());
@@ -49,6 +50,7 @@ namespace CodeDomExt.Generators
                     res.AddStatementHandler(new Csharp.DefaultStatementHandler());
                     res.AddCompileUnitHandler(new Csharp.DefaultCompileUnitHandler());
                     res.AddCommentHandler(new Csharp.DefaultCommentHandler());
+                    res.AddDirectiveHandler(new Csharp.DefaultDirectiveHandler());
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(language), language, null);

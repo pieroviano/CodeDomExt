@@ -5,21 +5,31 @@ using CodeDomExt.Utils;
 namespace CodeDomExt.Generators.Common
 {
     /// <summary>
-    /// A statement handler providing some implementation for the simpler statements, which also sets context property
-    /// <see cref="Context.StatementNeedsTermination"/>.
+    /// A statement handler providing some implementation for the simpler statements, and handling statements termination
+    /// when needed and any Start and EndDirectives
     /// If an implementation of this shouldn't handle some of the statements it should return null or an empty string in
     /// methods/property returning string, or false in methods returning bool.
     /// </summary>
     /// <remarks>
     /// A statement should be handled on a new and indented line.<para />
-    /// When a statement is handled, before returning the handler should set context property
-    /// <see cref="Context.StatementNeedsTermination"/> to true if it leaves doing the line termination
-    /// (; when necessary and newLine in C#) to the upper level, or false if it handled termination by itself.<para />
-    /// The statement handler should generate line termination only when handling statements that contains other
-    /// statements (like iterations or conditions)
+    /// The statement handler should generate its termination (";\n" in c# or just "\n" in vb) only if context property
+    /// <see cref="Context.StatementShouldTerminate"/> is set to true; statements containing other statements block may
+    /// ignore this property and always handle termination. Said property is present in order to allow correct generation of
+    /// the CodeIterationStatement, which has an InitStatement and IncrementStatement<para/>
+    /// A statement handler does not handle StartDirectives and EndDirectives
     /// </remarks>
     public abstract class DefaultStatementHandler : DynamicDispatchHandler<CodeStatement>
     {
+        private readonly bool _handleSnippet;
+        private readonly bool _handleComment;
+        
+        protected DefaultStatementHandler(bool handleSnippet = true, bool handleComment = true)
+        {
+            _handleComment = handleComment;
+            _handleSnippet = handleSnippet;
+        }
+        
+        
         /// <inheritdoc cref="ICodeObjectHandler{T}.Handle"/>
         protected override bool DoDynamicHandle(CodeStatement obj, Context ctx)
         {
@@ -28,16 +38,16 @@ namespace CodeDomExt.Generators.Common
 
         private bool HandleDynamic(CodeCommentStatement obj, Context ctx)
         {
+            if (!_handleComment) return false;
             ctx.HandlerProvider.CommentHandler.Handle(obj.Comment, ctx);
             ctx.Writer.NewLine();
-            ctx.StatementNeedsTermination = false;
             return true;
         }
 
         private bool HandleDynamic(CodeExpressionStatement obj, Context ctx)
         {
             ctx.HandlerProvider.ExpressionHandler.Handle(obj.Expression, ctx);
-            ctx.StatementNeedsTermination = true;
+            DoTerminationIfNeeded(ctx);
             return true;
         }
         
@@ -54,7 +64,7 @@ namespace CodeDomExt.Generators.Common
             ctx.HandlerProvider.ExpressionHandler.Handle(obj.Left, ctx);
             ctx.Writer.Write($" {AssignmentSymbol} ");
             ctx.HandlerProvider.ExpressionHandler.Handle(obj.Right, ctx);
-            ctx.StatementNeedsTermination = true;
+            DoTerminationIfNeeded(ctx);
             return true;
         }
  
@@ -63,7 +73,7 @@ namespace CodeDomExt.Generators.Common
         private bool HandleDynamic(CodeAttachEventStatement obj, Context ctx)
         {
             bool res = HandleAttachEvent(obj, ctx);
-            ctx.StatementNeedsTermination = true;
+            DoTerminationIfNeeded(ctx);
             return res;
         }
 
@@ -72,7 +82,6 @@ namespace CodeDomExt.Generators.Common
         private bool HandleDynamic(CodeConditionStatement obj, Context ctx)
         {
             bool res = HandleCondition(obj, ctx);
-            ctx.StatementNeedsTermination = false;
             return res;
         }
 
@@ -93,7 +102,7 @@ namespace CodeDomExt.Generators.Common
                 return false;
             }
             ctx.Writer.Write($"{GotoKeyword} {AsIdentifier(obj.Label)}");
-            ctx.StatementNeedsTermination = true;
+            DoTerminationIfNeeded(ctx);
             return true;
         }
 
@@ -118,7 +127,6 @@ namespace CodeDomExt.Generators.Common
             {
                 res = HandleFor(obj, ctx);
             }
-            ctx.StatementNeedsTermination = false;
             return res;
         }
 
@@ -133,7 +141,6 @@ namespace CodeDomExt.Generators.Common
                 return false;
             }
             ctx.Writer.WriteLine($"{AsIdentifier(obj.Label)}{LabelDefinitionSuffix}");
-            ctx.StatementNeedsTermination = false;
             return true;
         }
 
@@ -153,7 +160,7 @@ namespace CodeDomExt.Generators.Common
                 ctx.Writer.Write(" ");
                 ctx.HandlerProvider.ExpressionHandler.Handle(obj.Expression, ctx);
             }
-            ctx.StatementNeedsTermination = true;
+            DoTerminationIfNeeded(ctx);
             return true;
         }
 
@@ -162,7 +169,7 @@ namespace CodeDomExt.Generators.Common
         private bool HandleDynamic(CodeRemoveEventStatement obj, Context ctx)
         {
             bool res = HandleRemoveEvent(obj, ctx);
-            ctx.StatementNeedsTermination = true;
+            DoTerminationIfNeeded(ctx);
             return res;
         }
 
@@ -178,7 +185,7 @@ namespace CodeDomExt.Generators.Common
             }
             ctx.Writer.Write($"{ThrowKeyword} ");
             ctx.HandlerProvider.ExpressionHandler.Handle(obj.ToThrow, ctx);
-            ctx.StatementNeedsTermination = true;
+            DoTerminationIfNeeded(ctx);
             return true;
         }
 
@@ -187,7 +194,6 @@ namespace CodeDomExt.Generators.Common
         private bool HandleDynamic(CodeTryCatchFinallyStatement obj, Context ctx)
         {
             bool res = HandleTryCatchFinally(obj, ctx);
-            ctx.StatementNeedsTermination = false;
             return res;
         }
 
@@ -196,15 +202,15 @@ namespace CodeDomExt.Generators.Common
         private bool HandleDynamic(CodeVariableDeclarationStatement obj, Context ctx)
         {
             bool res = HandleVariableDeclaration(obj, ctx);
-            ctx.StatementNeedsTermination = true;
+            DoTerminationIfNeeded(ctx);
             return res;
         }
 
         private bool HandleDynamic(CodeSnippetStatement obj, Context ctx)
         {
+            if (!_handleSnippet) return false;
             GeneralUtils.HandleSnippet(obj.Value, ctx);
             ctx.Writer.NewLine();
-            ctx.StatementNeedsTermination = false;
             return true;
         }
 
@@ -228,7 +234,7 @@ namespace CodeDomExt.Generators.Common
             ctx.HandlerProvider.ExpressionHandler.Handle(obj.LeftExpression, ctx);
             ctx.Writer.Write($" {op}{ShorthandOperatorAssignmentSymbol} ");
             ctx.HandlerProvider.ExpressionHandler.Handle(obj.RightExpression, ctx);
-            ctx.StatementNeedsTermination = true;
+            DoTerminationIfNeeded(ctx);
             return true;
         }
 
@@ -237,7 +243,6 @@ namespace CodeDomExt.Generators.Common
         private bool HandleDynamic(CodePostTestIterationStatement obj, Context ctx)
         {
             bool res = HandleDoWhile(obj, ctx);
-            ctx.StatementNeedsTermination = false;
             return res;
         }
 
@@ -246,7 +251,6 @@ namespace CodeDomExt.Generators.Common
         private bool HandleDynamic(CodeForEachStatement obj, Context ctx)
         {
             bool res = HandleForEach(obj, ctx);
-            ctx.StatementNeedsTermination = false;
             return res;
         }
 
@@ -255,7 +259,6 @@ namespace CodeDomExt.Generators.Common
         private bool HandleDynamic(CodeUsingStatement obj, Context ctx)
         {
             bool res = HandleUsing(obj, ctx);
-            ctx.StatementNeedsTermination = false;
             return res;
         }
 
@@ -264,8 +267,26 @@ namespace CodeDomExt.Generators.Common
         private bool HandleDynamic(CodeBreakStatement obj, Context ctx)
         {
             bool res = HandleBreak(obj, ctx);
-            ctx.StatementNeedsTermination = true;
+            DoTerminationIfNeeded(ctx);
             return res;
         }
+
+        /// <summary>
+        /// Handles termination of a statement 
+        /// </summary>
+        /// <param name="ctx"></param>
+        protected void DoTerminationIfNeeded(Context ctx)
+        {
+            if (ctx.StatementShouldTerminate)
+            {
+                DoTermination(ctx);
+            }
+        }
+
+        /// <summary>
+        /// Handle the termination of a statement if ctx <see cref="Context.StatementShouldTerminate"/> property is set to true
+        /// </summary>
+        /// <param name="ctx"></param>
+        protected abstract void DoTermination(Context ctx);
     }
 }
