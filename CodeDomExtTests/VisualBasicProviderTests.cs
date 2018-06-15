@@ -330,5 +330,41 @@ namespace CodeDomExtTests
             };
             ProviderTestUtils.DoVisualBasicTest(expected, ProviderTestUtils.TestIdentifiersCompileUnit());
         }
+
+        [Fact]
+        public void TestDirective()
+        {
+            string[] expected =
+            {
+                "#Region \"Compile unit region\"",
+                "Option Strict Off",
+                "Option Explicit On",
+                "Option Infer On",
+                "",
+                "Namespace Test.Namespace",
+                "    #Region \"Class region\"",
+                "    Public Class TestClass",
+                "        #Region \"Fields region\"",
+                "        Private a As Integer",
+                "",
+                "        Private b As Integer",
+                "        #End Region",
+                "",
+                "        Public Sub Method()",
+                "            #Region \"region a\"",
+                "            #Region \"region b\"",
+                "            a = b",
+                "            Return a",
+                "            #End Region",
+                "            #End Region",
+                "        End Sub",
+                "    End Class",
+                "    #End Region",
+                "End Namespace",
+                "#End Region"
+            };
+            
+            ProviderTestUtils.DoVisualBasicTest(expected, ProviderTestUtils.TestDirectiveCompileUnit(), addOptions: false);
+        }
     }
 }

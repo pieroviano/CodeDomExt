@@ -425,5 +425,39 @@ namespace CodeDomExtTests
             };
             ProviderTestUtils.DoCSharpTest(expected, ProviderTestUtils.TestIdentifiersCompileUnit());
         }
+        
+        [Fact]
+        public void TestDirective()
+        {
+            string[] expected =
+            {
+                "#region Compile unit region",
+                "namespace Test.Namespace",
+                "{",
+                "    #region Class region",
+                "    public class TestClass",
+                "    {",
+                "        #region Fields region",
+                "        private int a;",
+                "",
+                "        private int b;",
+                "        #endregion",
+                "",
+                "        public void Method()",
+                "        {",
+                "            #region region a",
+                "            #region region b",
+                "            a = b;",
+                "            return a;",
+                "            #endregion",
+                "            #endregion",
+                "        }",
+                "    }",
+                "    #endregion",
+                "}",
+                "#endregion"
+            };
+            ProviderTestUtils.DoCSharpTest(expected, ProviderTestUtils.TestDirectiveCompileUnit());
+        }
     }
 }

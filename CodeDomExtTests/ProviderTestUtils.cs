@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Remoting.Messaging;
 using CodeDomExt.Generators;
 using CodeDomExt.Helpers;
 using CodeDomExt.Nodes;
@@ -669,6 +670,64 @@ namespace CodeDomExtTests
             return compileUnit;
         }
 
+        public static CodeCompileUnit TestDirectiveCompileUnit()
+        {
+            CodeCompileUnit compileUnit = new CodeCompileUnit();
+            CodeNamespace codeNamespace = new CodeNamespace("Test.Namespace");
+            CodeTypeDeclaration classDeclaration = new CodeTypeDeclaration("TestClass")
+            {
+                IsClass = true
+            };
+            classDeclaration.SetAccessibilityLevel(AccessibilityLevel.Public);
+
+            var method = new CodeMemberMethod()
+            {
+                Name = "Method",
+                Attributes = MemberAttributes.Public | MemberAttributes.Final
+            };
+
+            compileUnit.StartDirectives.Add(new CodeRegionDirective(CodeRegionMode.Start, "Compile unit region"));
+            compileUnit.EndDirectives.Add(new CodeRegionDirective(CodeRegionMode.End, null));
+            
+            classDeclaration.StartDirectives.Add(new CodeRegionDirective(CodeRegionMode.Start, "Class region"));
+            classDeclaration.EndDirectives.Add(new CodeRegionDirective(CodeRegionMode.End, null));
+            
+            var field1 = new CodeMemberField(Types.Int, "a");
+            var field2 = new CodeMemberField(Types.Int, "b");
+
+            field1.StartDirectives.Add(new CodeRegionDirective(CodeRegionMode.Start, "Fields region"));
+            field2.EndDirectives.Add(new CodeRegionDirective(CodeRegionMode.End, null));
+
+            method.Statements.Add(
+                new CodeAssignStatement(
+                    FieldReferenceExpression.Default("a"),
+                    FieldReferenceExpression.Default("b"))
+                {
+                    StartDirectives =
+                    {
+                        new CodeRegionDirective(CodeRegionMode.Start, "region a"),
+                        new CodeRegionDirective(CodeRegionMode.Start, "region b")
+                    }
+                });
+            method.Statements.Add(
+                new CodeMethodReturnStatement(
+                    FieldReferenceExpression.Default("a"))
+                {
+                    EndDirectives =
+                    {
+                        new CodeRegionDirective(CodeRegionMode.End, null),
+                        new CodeRegionDirective(CodeRegionMode.End, null)
+                    }
+                });
+            
+            compileUnit.Namespaces.Add(codeNamespace);
+            codeNamespace.Types.Add(classDeclaration);
+            classDeclaration.Members.Add(field1);
+            classDeclaration.Members.Add(field2);
+            classDeclaration.Members.Add(method);
+            return compileUnit;
+        }
+        
         public static void DoCSharpTest(string[] expected, CodeCompileUnit compileUnit, GeneratorOptions options = null)
         {
             DoTest(expected, compileUnit, Language.CSharp, options);

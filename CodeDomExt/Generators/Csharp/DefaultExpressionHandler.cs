@@ -10,6 +10,13 @@ namespace CodeDomExt.Generators.Csharp
     /// <inheritdoc/>
     public class DefaultExpressionHandler : Common.DefaultExpressionHandler
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public DefaultExpressionHandler() : base(true)
+        {
+        }
+        
         /// <inheritdoc/>
         protected override string PropertySetValueReferenceKeyword { get; } = "value";
         /// <inheritdoc/>

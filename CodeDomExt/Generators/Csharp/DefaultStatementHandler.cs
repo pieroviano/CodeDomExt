@@ -10,11 +10,23 @@ namespace CodeDomExt.Generators.Csharp
     {
         private readonly CatchClauseHandler _catchClauseHandler = new CatchClauseHandler();
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public DefaultStatementHandler() : base(true, true, true)
+        {
+        }
+        
         /// <inheritdoc/>
         protected override string AsIdentifier(string s)
         {
             return s.AsCsId();
         }
+
+        /// <inheritdoc/>
+        protected override bool CanHandleWhile => true;
+        /// <inheritdoc/>
+        protected override bool CanHandleFor => true;
 
         /// <inheritdoc/>
         protected override string GotoKeyword { get; } = "goto";
@@ -34,15 +46,20 @@ namespace CodeDomExt.Generators.Csharp
             return op.CanBeShorthandOperator() ? CSharpKeywordsUtils.OperatorSymbol(op) : null;
         }
         /// <inheritdoc/>
-        protected override bool HandleAttachEvent(CodeAttachEventStatement obj, Context ctx)
+        protected override bool CanHandleAttachEvent => true;
+
+        /// <inheritdoc/>
+        protected override void HandleAttachEvent(CodeAttachEventStatement obj, Context ctx)
         {
             ctx.HandlerProvider.ExpressionHandler.Handle(obj.Event, ctx);
             ctx.Writer.Write(" += ");
             ctx.HandlerProvider.ExpressionHandler.Handle(obj.Listener, ctx);
-            return true;
         }
         /// <inheritdoc/>
-        protected override bool HandleCondition(CodeConditionStatement obj, Context ctx)
+        protected override bool CanHandleCondition => true;
+
+        /// <inheritdoc/>
+        protected override void HandleCondition(CodeConditionStatement obj, Context ctx)
         {
             ctx.Writer.Write("if (");
             ctx.HandlerProvider.ExpressionHandler.Handle(obj.Condition, ctx);
@@ -61,19 +78,17 @@ namespace CodeDomExt.Generators.Csharp
                     CSharpUtils.HandleStatementCollection(obj.FalseStatements, ctx);
                 }
             }
-            return true;
         }
         /// <inheritdoc/>
-        protected override bool HandleWhile(CodeIterationStatement obj, Context ctx)
+        protected override void HandleWhile(CodeIterationStatement obj, Context ctx)
         {
             ctx.Writer.Write("while (");
             ctx.HandlerProvider.ExpressionHandler.Handle(obj.TestExpression, ctx);
             ctx.Writer.Write(")");
             CSharpUtils.HandleStatementCollection(obj.Statements, ctx);
-            return true;
         }
         /// <inheritdoc/>
-        protected override bool HandleFor(CodeIterationStatement obj, Context ctx)
+        protected override void HandleFor(CodeIterationStatement obj, Context ctx)
         {
             ctx.StatementShouldTerminate = false;
             ctx.Writer.Write("for (");
@@ -91,18 +106,22 @@ namespace CodeDomExt.Generators.Csharp
             ctx.Writer.Write(")");
             ctx.StatementShouldTerminate = true;
             CSharpUtils.HandleStatementCollection(obj.Statements, ctx);
-            return true;
         }
         /// <inheritdoc/>
-        protected override bool HandleRemoveEvent(CodeRemoveEventStatement obj, Context ctx)
+        protected override bool CanHandleRemoveEvent => true;
+
+        /// <inheritdoc/>
+        protected override void HandleRemoveEvent(CodeRemoveEventStatement obj, Context ctx)
         {
             ctx.HandlerProvider.ExpressionHandler.Handle(obj.Event, ctx);
             ctx.Writer.Write(" -= ");
             ctx.HandlerProvider.ExpressionHandler.Handle(obj.Listener, ctx);
-            return true;
         }
         /// <inheritdoc/>
-        protected override bool HandleTryCatchFinally(CodeTryCatchFinallyStatement obj, Context ctx)
+        protected override bool CanHandleTryCatchFinally => true;
+
+        /// <inheritdoc/>
+        protected override void HandleTryCatchFinally(CodeTryCatchFinallyStatement obj, Context ctx)
         {
             ctx.Writer.Write("try");
             CSharpUtils.HandleStatementCollection(obj.TryStatements, ctx);
@@ -113,10 +132,12 @@ namespace CodeDomExt.Generators.Csharp
                 ctx.Writer.Write("finally");
                 CSharpUtils.HandleStatementCollection(obj.FinallyStatements, ctx);
             }
-            return true;
         }
         /// <inheritdoc/>
-        protected override bool HandleVariableDeclaration(CodeVariableDeclarationStatement obj, Context ctx)
+        protected override bool CanHandleVariableDeclaration => true;
+
+        /// <inheritdoc/>
+        protected override void HandleVariableDeclaration(CodeVariableDeclarationStatement obj, Context ctx)
         {
             WriteTypeOrVar(obj.Type, ctx);
             ctx.Writer.Write($" {obj.Name.AsCsId()}");
@@ -125,10 +146,12 @@ namespace CodeDomExt.Generators.Csharp
                 ctx.Writer.Write(" = ");
                 ctx.HandlerProvider.ExpressionHandler.Handle(obj.InitExpression, ctx);
             }
-            return true;
         }
         /// <inheritdoc/>
-        protected override bool HandleDoWhile(CodePostTestIterationStatement obj, Context ctx)
+        protected override bool CanHandleDoWhile => true;
+
+        /// <inheritdoc/>
+        protected override void HandleDoWhile(CodePostTestIterationStatement obj, Context ctx)
         {
             ctx.Writer.WriteLine("do");
             ctx.Writer.IndentAndWriteLine("{", ctx);
@@ -138,10 +161,12 @@ namespace CodeDomExt.Generators.Csharp
             ctx.Writer.IndentAndWrite("} while (", ctx);
             ctx.HandlerProvider.ExpressionHandler.Handle(obj.TestExpression, ctx);
             ctx.Writer.WriteLine(");");
-            return true;
         }
         /// <inheritdoc/>
-        protected override bool HandleForEach(CodeForEachStatement obj, Context ctx)
+        protected override bool CanHandleForEach => true;
+
+        /// <inheritdoc/>
+        protected override void HandleForEach(CodeForEachStatement obj, Context ctx)
         {
             ctx.Writer.Write("foreach (");
             WriteTypeOrVar(obj.ItemType, ctx);
@@ -150,11 +175,12 @@ namespace CodeDomExt.Generators.Csharp
             ctx.Writer.Write(")");
 
             CSharpUtils.HandleStatementCollection(obj.Statements, ctx);
-            
-            return true;
         }
         /// <inheritdoc/>
-        protected override bool HandleUsing(CodeUsingStatement obj, Context ctx)
+        protected override bool CanHandleUsing => true;
+
+        /// <inheritdoc/>
+        protected override void HandleUsing(CodeUsingStatement obj, Context ctx)
         {
             ctx.Writer.Write("using (");
             WriteTypeOrVar(obj.Type, ctx);
@@ -162,14 +188,14 @@ namespace CodeDomExt.Generators.Csharp
             ctx.HandlerProvider.ExpressionHandler.Handle(obj.InitializerExpression, ctx);
             ctx.Writer.Write(")");
             CSharpUtils.HandleStatementCollection(obj.Statements, ctx);
-            
-            return true;
         }
         /// <inheritdoc/>
-        protected override bool HandleBreak(CodeBreakStatement obj, Context ctx)
+        protected override bool CanHandleBreak => true;
+
+        /// <inheritdoc/>
+        protected override void HandleBreak(CodeBreakStatement obj, Context ctx)
         {
             ctx.Writer.Write("break");
-            return true;
         }
 
         /// <inheritdoc />

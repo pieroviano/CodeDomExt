@@ -12,6 +12,12 @@ namespace CodeDomExt.Generators.VisualBasic
     /// <inheritdoc />
     public class DefaultExpressionHandler : Common.DefaultExpressionHandler
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public DefaultExpressionHandler() : base(true)
+        {
+        }
 
         /// <inheritdoc />
         protected override bool HandleDynamic(CodeObjectCreateExpression obj, Context ctx)

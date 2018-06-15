@@ -1,4 +1,6 @@
-﻿using System.CodeDom;
+﻿using System;
+using System.CodeDom;
+using System.Linq;
 using CodeDomExt.Nodes;
 using CodeDomExt.Utils;
 
@@ -22,9 +24,17 @@ namespace CodeDomExt.Generators.Common
     {
         private readonly bool _handleSnippet;
         private readonly bool _handleComment;
+        private readonly bool _handleExpression;
         
-        protected DefaultStatementHandler(bool handleSnippet = true, bool handleComment = true)
+        /// <summary>
+        /// Default constructor
+        /// </summary>
+        /// <param name="handleExpression">true if expression statement should be handled by this</param>
+        /// <param name="handleSnippet">true if snippet statement should be handled by this</param>
+        /// <param name="handleComment">true if comment statement should be handled by this</param>
+        protected DefaultStatementHandler(bool handleExpression, bool handleSnippet, bool handleComment)
         {
+            _handleExpression = handleExpression;
             _handleComment = handleComment;
             _handleSnippet = handleSnippet;
         }
@@ -38,17 +48,19 @@ namespace CodeDomExt.Generators.Common
 
         private bool HandleDynamic(CodeCommentStatement obj, Context ctx)
         {
-            if (!_handleComment) return false;
-            ctx.HandlerProvider.CommentHandler.Handle(obj.Comment, ctx);
-            ctx.Writer.NewLine();
-            return true;
+            return HandleIfTrue(
+                () =>
+                {
+                    ctx.HandlerProvider.CommentHandler.Handle(obj.Comment, ctx);
+                    ctx.Writer.NewLine();
+                }, obj, ctx, _handleComment, false);
         }
 
         private bool HandleDynamic(CodeExpressionStatement obj, Context ctx)
         {
-            ctx.HandlerProvider.ExpressionHandler.Handle(obj.Expression, ctx);
-            DoTerminationIfNeeded(ctx);
-            return true;
+            return HandleIfTrue(
+                () => { ctx.HandlerProvider.ExpressionHandler.Handle(obj.Expression, ctx); }, obj, ctx,
+                _handleExpression);
         }
         
         /// <summary>
@@ -57,32 +69,35 @@ namespace CodeDomExt.Generators.Common
         protected abstract string AssignmentSymbol { get; }
         private bool HandleDynamic(CodeAssignStatement obj, Context ctx)
         {
-            if (string.IsNullOrEmpty(AssignmentSymbol))
-            {
-                return false;
-            }
-            ctx.HandlerProvider.ExpressionHandler.Handle(obj.Left, ctx);
-            ctx.Writer.Write($" {AssignmentSymbol} ");
-            ctx.HandlerProvider.ExpressionHandler.Handle(obj.Right, ctx);
-            DoTerminationIfNeeded(ctx);
-            return true;
+            return HandleIfTrue(
+                () =>
+                {
+                    ctx.HandlerProvider.ExpressionHandler.Handle(obj.Left, ctx);
+                    ctx.Writer.Write($" {AssignmentSymbol} ");
+                    ctx.HandlerProvider.ExpressionHandler.Handle(obj.Right, ctx);
+                }, obj, ctx, !string.IsNullOrEmpty(AssignmentSymbol));
         }
  
+        /// <summary>
+        /// True if the handler should handle attach event statement
+        /// </summary>
+        protected abstract bool CanHandleAttachEvent { get; }
         /// <inheritdoc cref="ICodeObjectHandler{T}.Handle"/>
-        protected abstract bool HandleAttachEvent(CodeAttachEventStatement obj, Context ctx);
+        protected abstract void HandleAttachEvent(CodeAttachEventStatement obj, Context ctx);
         private bool HandleDynamic(CodeAttachEventStatement obj, Context ctx)
         {
-            bool res = HandleAttachEvent(obj, ctx);
-            DoTerminationIfNeeded(ctx);
-            return res;
+            return HandleIfTrue(() => { HandleAttachEvent(obj, ctx); }, obj, ctx, CanHandleAttachEvent);
         }
 
+        /// <summary>
+        /// True if the handler should handle condition statement
+        /// </summary>
+        protected abstract bool CanHandleCondition { get; }
         /// <inheritdoc cref="ICodeObjectHandler{T}.Handle"/>
-        protected abstract bool HandleCondition(CodeConditionStatement obj, Context ctx);
+        protected abstract void HandleCondition(CodeConditionStatement obj, Context ctx);
         private bool HandleDynamic(CodeConditionStatement obj, Context ctx)
         {
-            bool res = HandleCondition(obj, ctx);
-            return res;
+            return HandleIfTrue(() => { HandleCondition(obj, ctx); }, obj, ctx, CanHandleCondition, false);
         }
 
         /// <summary>
@@ -97,15 +112,18 @@ namespace CodeDomExt.Generators.Common
         protected abstract string AsIdentifier(string s);
         private bool HandleDynamic(CodeGotoStatement obj, Context ctx)
         {
-            if (string.IsNullOrEmpty(GotoKeyword))
-            {
-                return false;
-            }
-            ctx.Writer.Write($"{GotoKeyword} {AsIdentifier(obj.Label)}");
-            DoTerminationIfNeeded(ctx);
-            return true;
+            return HandleIfTrue(() => { ctx.Writer.Write($"{GotoKeyword} {AsIdentifier(obj.Label)}"); }, obj, ctx,
+                !string.IsNullOrEmpty(GotoKeyword));
         }
 
+        /// <summary>
+        /// True if the handler should handle while statement
+        /// </summary>
+        protected abstract bool CanHandleWhile { get; }
+        /// <summary>
+        /// True if the handler should handle for statement
+        /// </summary>
+        protected abstract bool CanHandleFor { get; }
         /// <summary>
         /// Handle the code iteration statement ignoring its <see cref="CodeIterationStatement.InitStatement"/> and
         /// <see cref="CodeIterationStatement.IncrementStatement"/>
@@ -113,21 +131,20 @@ namespace CodeDomExt.Generators.Common
         /// <param name="obj"></param>
         /// <param name="ctx"></param>
         /// <returns></returns>
-        protected abstract bool HandleWhile(CodeIterationStatement obj, Context ctx);
+        protected abstract void HandleWhile(CodeIterationStatement obj, Context ctx);
         /// <inheritdoc cref="ICodeObjectHandler{T}.Handle"/>
-        protected abstract bool HandleFor(CodeIterationStatement obj, Context ctx);
+        protected abstract void HandleFor(CodeIterationStatement obj, Context ctx);
         private bool HandleDynamic(CodeIterationStatement obj, Context ctx)
         {
-            bool res;
             if (obj.InitStatement == null && obj.IncrementStatement == null)
             {
-                res = HandleWhile(obj, ctx);
+                return HandleIfTrue(() => { HandleWhile(obj, ctx); }, obj, ctx, CanHandleWhile, false);
+
             }
             else
             {
-                res = HandleFor(obj, ctx);
+                return HandleIfTrue(() => { HandleFor(obj, ctx); }, obj, ctx, CanHandleFor, false);
             }
-            return res;
         }
 
         /// <summary>
@@ -136,12 +153,8 @@ namespace CodeDomExt.Generators.Common
         protected abstract string LabelDefinitionSuffix { get; }
         private bool HandleDynamic(CodeLabeledStatement obj, Context ctx)
         {
-            if (string.IsNullOrEmpty(LabelDefinitionSuffix))
-            {
-                return false;
-            }
-            ctx.Writer.WriteLine($"{AsIdentifier(obj.Label)}{LabelDefinitionSuffix}");
-            return true;
+            return HandleIfTrue(() => { ctx.Writer.WriteLine($"{AsIdentifier(obj.Label)}{LabelDefinitionSuffix}"); },
+                obj, ctx, !string.IsNullOrEmpty(LabelDefinitionSuffix), false);
         }
 
         /// <summary>
@@ -150,27 +163,26 @@ namespace CodeDomExt.Generators.Common
         protected abstract string ReturnKeyword { get; }
         private bool HandleDynamic(CodeMethodReturnStatement obj, Context ctx)
         {
-            if (string.IsNullOrEmpty(ReturnKeyword))
+            return HandleIfTrue(() =>
             {
-                return false;
-            }
-            ctx.Writer.Write(ReturnKeyword);
-            if (obj.Expression != null)
-            {
-                ctx.Writer.Write(" ");
-                ctx.HandlerProvider.ExpressionHandler.Handle(obj.Expression, ctx);
-            }
-            DoTerminationIfNeeded(ctx);
-            return true;
+                ctx.Writer.Write(ReturnKeyword);
+                if (obj.Expression != null)
+                {
+                    ctx.Writer.Write(" ");
+                    ctx.HandlerProvider.ExpressionHandler.Handle(obj.Expression, ctx);
+                }
+            }, obj, ctx, !string.IsNullOrEmpty(ReturnKeyword));
         }
 
+        /// <summary>
+        /// True if the handler should handle remove event statement
+        /// </summary>
+        protected abstract bool CanHandleRemoveEvent { get; }
         /// <inheritdoc cref="ICodeObjectHandler{T}.Handle"/>
-        protected abstract bool HandleRemoveEvent(CodeRemoveEventStatement obj, Context ctx);
+        protected abstract void HandleRemoveEvent(CodeRemoveEventStatement obj, Context ctx);
         private bool HandleDynamic(CodeRemoveEventStatement obj, Context ctx)
         {
-            bool res = HandleRemoveEvent(obj, ctx);
-            DoTerminationIfNeeded(ctx);
-            return res;
+            return HandleIfTrue(() => { HandleRemoveEvent(obj, ctx); }, obj, ctx, CanHandleRemoveEvent);
         }
 
         /// <summary>
@@ -179,39 +191,48 @@ namespace CodeDomExt.Generators.Common
         protected abstract string ThrowKeyword { get; }
         private bool HandleDynamic(CodeThrowExceptionStatement obj, Context ctx)
         {
-            if (string.IsNullOrEmpty(ThrowKeyword))
+            return HandleIfTrue(() =>
             {
-                return false;
-            }
-            ctx.Writer.Write($"{ThrowKeyword} ");
-            ctx.HandlerProvider.ExpressionHandler.Handle(obj.ToThrow, ctx);
-            DoTerminationIfNeeded(ctx);
-            return true;
+                ctx.Writer.Write($"{ThrowKeyword} ");
+                ctx.HandlerProvider.ExpressionHandler.Handle(obj.ToThrow, ctx);
+            }, obj, ctx, !string.IsNullOrEmpty(ThrowKeyword));
         }
 
+        /// <summary>
+        /// True if the handler should handle try-catch-finally statement
+        /// </summary>
+        protected abstract bool CanHandleTryCatchFinally { get; }
         /// <inheritdoc cref="ICodeObjectHandler{T}.Handle"/>
-        protected abstract bool HandleTryCatchFinally(CodeTryCatchFinallyStatement obj, Context ctx);
+        protected abstract void HandleTryCatchFinally(CodeTryCatchFinallyStatement obj, Context ctx);
         private bool HandleDynamic(CodeTryCatchFinallyStatement obj, Context ctx)
         {
-            bool res = HandleTryCatchFinally(obj, ctx);
-            return res;
+            return HandleIfTrue(() =>
+            {
+                HandleTryCatchFinally(obj, ctx);
+            }, obj, ctx, CanHandleTryCatchFinally, false);
         }
 
+        /// <summary>
+        /// True if the handler should handle variable declaration statement
+        /// </summary>
+        protected abstract bool CanHandleVariableDeclaration { get; }
         /// <inheritdoc cref="ICodeObjectHandler{T}.Handle"/>
-        protected abstract bool HandleVariableDeclaration(CodeVariableDeclarationStatement obj, Context ctx);
+        protected abstract void HandleVariableDeclaration(CodeVariableDeclarationStatement obj, Context ctx);
         private bool HandleDynamic(CodeVariableDeclarationStatement obj, Context ctx)
         {
-            bool res = HandleVariableDeclaration(obj, ctx);
-            DoTerminationIfNeeded(ctx);
-            return res;
+            return HandleIfTrue(() =>
+            {
+                HandleVariableDeclaration(obj, ctx);
+            }, obj, ctx, CanHandleVariableDeclaration);
         }
 
         private bool HandleDynamic(CodeSnippetStatement obj, Context ctx)
         {
-            if (!_handleSnippet) return false;
-            GeneralUtils.HandleSnippet(obj.Value, ctx);
-            ctx.Writer.NewLine();
-            return true;
+            return HandleIfTrue(() =>
+            {
+                GeneralUtils.HandleSnippet(obj.Value, ctx);
+                ctx.Writer.NewLine();
+            }, obj, ctx, _handleSnippet, false);
         }
 
         /// <summary>
@@ -227,60 +248,59 @@ namespace CodeDomExt.Generators.Common
         private bool HandleDynamic(CodeOperationAssignmentStatement obj, Context ctx)
         {
             string op = GetShorthandOperatorSymbol(obj.Operator);
-            if (string.IsNullOrEmpty(op) || string.IsNullOrEmpty(ShorthandOperatorAssignmentSymbol))
-            {
-                return false;
-            }
-            ctx.HandlerProvider.ExpressionHandler.Handle(obj.LeftExpression, ctx);
-            ctx.Writer.Write($" {op}{ShorthandOperatorAssignmentSymbol} ");
-            ctx.HandlerProvider.ExpressionHandler.Handle(obj.RightExpression, ctx);
-            DoTerminationIfNeeded(ctx);
-            return true;
-        }
-
-        /// <inheritdoc cref="ICodeObjectHandler{T}.Handle"/>
-        protected abstract bool HandleDoWhile(CodePostTestIterationStatement obj, Context ctx);
-        private bool HandleDynamic(CodePostTestIterationStatement obj, Context ctx)
-        {
-            bool res = HandleDoWhile(obj, ctx);
-            return res;
-        }
-
-        /// <inheritdoc cref="ICodeObjectHandler{T}.Handle"/>
-        protected abstract bool HandleForEach(CodeForEachStatement obj, Context ctx);
-        private bool HandleDynamic(CodeForEachStatement obj, Context ctx)
-        {
-            bool res = HandleForEach(obj, ctx);
-            return res;
-        }
-
-        /// <inheritdoc cref="ICodeObjectHandler{T}.Handle"/>
-        protected abstract bool HandleUsing(CodeUsingStatement obj, Context ctx);
-        private bool HandleDynamic(CodeUsingStatement obj, Context ctx)
-        {
-            bool res = HandleUsing(obj, ctx);
-            return res;
-        }
-
-        /// <inheritdoc cref="ICodeObjectHandler{T}.Handle"/>
-        protected abstract bool HandleBreak(CodeBreakStatement obj, Context ctx);
-        private bool HandleDynamic(CodeBreakStatement obj, Context ctx)
-        {
-            bool res = HandleBreak(obj, ctx);
-            DoTerminationIfNeeded(ctx);
-            return res;
+            return HandleIfTrue(() =>
+                {
+                    ctx.HandlerProvider.ExpressionHandler.Handle(obj.LeftExpression, ctx);
+                    ctx.Writer.Write($" {op}{ShorthandOperatorAssignmentSymbol} ");
+                    ctx.HandlerProvider.ExpressionHandler.Handle(obj.RightExpression, ctx);
+                }, obj, ctx, !string.IsNullOrEmpty(op) && !string.IsNullOrEmpty(ShorthandOperatorAssignmentSymbol));
         }
 
         /// <summary>
-        /// Handles termination of a statement 
+        /// True if the handler should handle do while statement
         /// </summary>
-        /// <param name="ctx"></param>
-        protected void DoTerminationIfNeeded(Context ctx)
+        protected abstract bool CanHandleDoWhile { get; }
+        /// <inheritdoc cref="ICodeObjectHandler{T}.Handle"/>
+        protected abstract void HandleDoWhile(CodePostTestIterationStatement obj, Context ctx);
+        private bool HandleDynamic(CodePostTestIterationStatement obj, Context ctx)
         {
-            if (ctx.StatementShouldTerminate)
+            return HandleIfTrue(() => { HandleDoWhile(obj, ctx); }, obj, ctx, CanHandleDoWhile, false);
+        }
+
+        /// <summary>
+        /// True if the handler should handle foreach statement
+        /// </summary>
+        protected abstract bool CanHandleForEach { get; }
+        /// <inheritdoc cref="ICodeObjectHandler{T}.Handle"/>
+        protected abstract void HandleForEach(CodeForEachStatement obj, Context ctx);
+        private bool HandleDynamic(CodeForEachStatement obj, Context ctx)
+        {
+            return HandleIfTrue(() => { HandleForEach(obj, ctx); }, obj, ctx, CanHandleForEach, false);
+        }
+
+        /// <summary>
+        /// True if the handler should handle using statement
+        /// </summary>
+        protected abstract bool CanHandleUsing { get; }
+        /// <inheritdoc cref="ICodeObjectHandler{T}.Handle"/>
+        protected abstract void HandleUsing(CodeUsingStatement obj, Context ctx);
+        private bool HandleDynamic(CodeUsingStatement obj, Context ctx)
+        {
+            return HandleIfTrue(() =>
             {
-                DoTermination(ctx);
-            }
+                HandleUsing(obj, ctx);
+            }, obj, ctx, CanHandleUsing, false);
+        }
+
+        /// <summary>
+        /// True if the handler should handle break statement
+        /// </summary>
+        protected abstract bool CanHandleBreak { get; }
+        /// <inheritdoc cref="ICodeObjectHandler{T}.Handle"/>
+        protected abstract void HandleBreak(CodeBreakStatement obj, Context ctx);
+        private bool HandleDynamic(CodeBreakStatement obj, Context ctx)
+        {
+            return HandleIfTrue(() => { HandleBreak(obj, ctx); }, obj, ctx, CanHandleBreak);
         }
 
         /// <summary>
@@ -288,5 +308,23 @@ namespace CodeDomExt.Generators.Common
         /// </summary>
         /// <param name="ctx"></param>
         protected abstract void DoTermination(Context ctx);
+
+        private bool HandleIfTrue(Action handleAction, CodeStatement obj, Context ctx, bool condition, bool doTerminationIfNeeded = true)
+        {
+            if (condition)
+            {
+                GeneralUtils.HandleCollectionOnMultipleLines(obj.StartDirectives.Cast<CodeDirective>(),
+                    ctx.HandlerProvider.DirectiveHandler, ctx, false);
+                handleAction();
+                if (doTerminationIfNeeded && ctx.StatementShouldTerminate)
+                {
+                    DoTermination(ctx);
+                }
+                GeneralUtils.HandleCollectionOnMultipleLines(obj.EndDirectives.Cast<CodeDirective>(),
+                    ctx.HandlerProvider.DirectiveHandler, ctx, true);
+            }
+
+            return condition;
+        }
     }
 }

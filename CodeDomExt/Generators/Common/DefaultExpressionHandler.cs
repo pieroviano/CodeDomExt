@@ -16,7 +16,11 @@ namespace CodeDomExt.Generators.Common
     {
         private readonly bool _handleSnippet;
 
-        protected DefaultExpressionHandler(bool handleSnippet = true)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="handleSnippet">true if snippet expression should be handled by this</param>
+        protected DefaultExpressionHandler(bool handleSnippet)
         {
             _handleSnippet = handleSnippet;
         }

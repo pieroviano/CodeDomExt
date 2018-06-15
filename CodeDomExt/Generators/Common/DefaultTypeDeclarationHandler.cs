@@ -1,5 +1,6 @@
 ﻿using System;
 using System.CodeDom;
+using System.Linq;
 using CodeDomExt.Utils;
 
 namespace CodeDomExt.Generators.Common
@@ -24,6 +25,9 @@ namespace CodeDomExt.Generators.Common
                 return false;
             }
             
+            GeneralUtils.HandleCollectionOnMultipleLines(obj.StartDirectives.Cast<CodeDirective>(),
+                ctx.HandlerProvider.DirectiveHandler, ctx, false);
+            
             foreach (CodeCommentStatement comment in obj.Comments)
             {
                 ctx.HandlerProvider.StatementHandler.Handle(comment, ctx);
@@ -35,6 +39,9 @@ namespace CodeDomExt.Generators.Common
             HandleTypeDeclaration(obj, type, ctx);
 
             ctx.TypeDeclarationStack.Pop();
+            
+            GeneralUtils.HandleCollectionOnMultipleLines(obj.EndDirectives.Cast<CodeDirective>(),
+                ctx.HandlerProvider.DirectiveHandler, ctx, true);
             return true;
         }
 

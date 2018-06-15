@@ -8,26 +8,36 @@ namespace CodeDomExt.Generators.VisualBasic
     /// <inheritdoc />
     public class DefaultStatementHandler : Common.DefaultStatementHandler
     {
+        public DefaultStatementHandler() : base(true, true, true)
+        {
+        }
+        
         /// <inheritdoc />
         protected override string AssignmentSymbol { get; } = "=";
+
         /// <inheritdoc />
-        protected override bool HandleAttachEvent(CodeAttachEventStatement obj, Context ctx)
+        protected override bool CanHandleAttachEvent => true;
+
+        /// <inheritdoc />
+        protected override void HandleAttachEvent(CodeAttachEventStatement obj, Context ctx)
         {
             ctx.Writer.Write("AddHandler ");
             ctx.HandlerProvider.ExpressionHandler.Handle(obj.Event, ctx);
             ctx.Writer.Write(", ");
             ctx.HandlerProvider.ExpressionHandler.Handle(obj.Listener, ctx);
-            return true;
         }
+
         /// <inheritdoc />
-        protected override bool HandleCondition(CodeConditionStatement obj, Context ctx)
+        protected override bool CanHandleCondition => true;
+
+        /// <inheritdoc />
+        protected override void HandleCondition(CodeConditionStatement obj, Context ctx)
         {
             VisualBasicUtils.BeginBlock(BlockType.If, ctx, false);
             HandleConditionNoBlock(obj, ctx);
             ctx.Writer.Indent(ctx);
             VisualBasicUtils.EndBlock(ctx, false);
             ctx.Writer.NewLine();
-            return true;
         }
         private void HandleConditionNoBlock(CodeConditionStatement obj, Context ctx)
         {
@@ -58,16 +68,22 @@ namespace CodeDomExt.Generators.VisualBasic
         {
             return s.AsVbId();
         }
+
         /// <inheritdoc />
-        protected override bool HandleWhile(CodeIterationStatement obj, Context ctx)
+        protected override bool CanHandleWhile => true;
+
+        /// <inheritdoc />
+        protected override bool CanHandleFor => true;
+
+        /// <inheritdoc />
+        protected override void HandleWhile(CodeIterationStatement obj, Context ctx)
         {
             ctx.Writer.Write("While ");
             ctx.HandlerProvider.ExpressionHandler.Handle(obj.TestExpression, ctx);
             VisualBasicUtils.HandleStatementCollection(obj.Statements, ctx, BlockType.While);
-            return true;
         }
         /// <inheritdoc />
-        protected override bool HandleFor(CodeIterationStatement obj, Context ctx)
+        protected override void HandleFor(CodeIterationStatement obj, Context ctx)
         {
             ctx.HandlerProvider.StatementHandler.Handle(obj.InitStatement, ctx);
             ctx.Writer.Indent(ctx);
@@ -75,25 +91,31 @@ namespace CodeDomExt.Generators.VisualBasic
             equivalent.Statements.AddRange(obj.Statements);
             equivalent.Statements.Add(obj.IncrementStatement);
             HandleWhile(equivalent, ctx);
-            return true;
         }
         /// <inheritdoc />
         protected override string LabelDefinitionSuffix { get; } = ":";
         /// <inheritdoc />
         protected override string ReturnKeyword { get; } = "Return";
+
         /// <inheritdoc />
-        protected override bool HandleRemoveEvent(CodeRemoveEventStatement obj, Context ctx)
+        protected override bool CanHandleRemoveEvent => true;
+
+        /// <inheritdoc />
+        protected override void HandleRemoveEvent(CodeRemoveEventStatement obj, Context ctx)
         {
             ctx.Writer.Write("RemoveHandler ");
             ctx.HandlerProvider.ExpressionHandler.Handle(obj.Event, ctx);
             ctx.Writer.Write(", AddressOf ");
             ctx.HandlerProvider.ExpressionHandler.Handle(obj.Listener, ctx);
-            return true;
         }
         /// <inheritdoc />
         protected override string ThrowKeyword { get; } = "Throw";
+
         /// <inheritdoc />
-        protected override bool HandleTryCatchFinally(CodeTryCatchFinallyStatement obj, Context ctx)
+        protected override bool CanHandleTryCatchFinally => true;
+
+        /// <inheritdoc />
+        protected override void HandleTryCatchFinally(CodeTryCatchFinallyStatement obj, Context ctx)
         {
             VisualBasicUtils.BeginBlock(BlockType.Try, ctx, false);
             ctx.Writer.Write("Try");
@@ -114,10 +136,13 @@ namespace CodeDomExt.Generators.VisualBasic
             ctx.Writer.Indent(ctx);
             VisualBasicUtils.EndBlock(ctx, false);
             ctx.Writer.NewLine();
-            return true;
         }
+
         /// <inheritdoc />
-        protected override bool HandleVariableDeclaration(CodeVariableDeclarationStatement obj, Context ctx)
+        protected override bool CanHandleVariableDeclaration => true;
+
+        /// <inheritdoc />
+        protected override void HandleVariableDeclaration(CodeVariableDeclarationStatement obj, Context ctx)
         {
             ctx.Writer.Write($"Dim {obj.Name.AsVbId()}");
             if (!GeneralUtils.IsNullOrVoidType(obj.Type))
@@ -129,7 +154,6 @@ namespace CodeDomExt.Generators.VisualBasic
                 ctx.Writer.Write(" = ");
                 ctx.HandlerProvider.ExpressionHandler.Handle(obj.InitExpression, ctx);
             }
-            return true;
         }
         /// <inheritdoc />
         protected override string ShorthandOperatorAssignmentSymbol { get; } = "=";
@@ -138,8 +162,12 @@ namespace CodeDomExt.Generators.VisualBasic
         {
             return op.CanBeShorthandOperator() ? VisualBasicKeywordsUtils.OperatorSymbol(op) : null;
         }
+
         /// <inheritdoc />
-        protected override bool HandleDoWhile(CodePostTestIterationStatement obj, Context ctx)
+        protected override bool CanHandleDoWhile => true;
+
+        /// <inheritdoc />
+        protected override void HandleDoWhile(CodePostTestIterationStatement obj, Context ctx)
         {
             VisualBasicUtils.BeginBlock(BlockType.Do, ctx, false);
             ctx.Writer.WriteLine("Do");
@@ -150,10 +178,13 @@ namespace CodeDomExt.Generators.VisualBasic
             ctx.HandlerProvider.ExpressionHandler.Handle(obj.TestExpression, ctx);
             ctx.Writer.NewLine();
             VisualBasicUtils.EndBlock(ctx, false, false);
-            return true;
         }
+
         /// <inheritdoc />
-        protected override bool HandleForEach(CodeForEachStatement obj, Context ctx)
+        protected override bool CanHandleForEach => true;
+
+        /// <inheritdoc />
+        protected override void HandleForEach(CodeForEachStatement obj, Context ctx)
         {
             VisualBasicUtils.BeginBlock(BlockType.For, ctx, false);
             ctx.Writer.Write($"For Each {obj.ItemName.AsVbId()}");
@@ -170,10 +201,13 @@ namespace CodeDomExt.Generators.VisualBasic
             ctx.Unindent();
             ctx.Writer.IndentAndWriteLine("Next", ctx);
             VisualBasicUtils.EndBlock(ctx, false, false);
-            return true;
         }
+
         /// <inheritdoc />
-        protected override bool HandleUsing(CodeUsingStatement obj, Context ctx)
+        protected override bool CanHandleUsing => true;
+
+        /// <inheritdoc />
+        protected override void HandleUsing(CodeUsingStatement obj, Context ctx)
         {
             ctx.Writer.Write($"Using {obj.VariableName} As ");
             if (!GeneralUtils.IsNullOrVoidType(obj.Type))
@@ -184,14 +218,16 @@ namespace CodeDomExt.Generators.VisualBasic
 
             ctx.HandlerProvider.ExpressionHandler.Handle(obj.InitializerExpression, ctx);
             VisualBasicUtils.HandleStatementCollection(obj.Statements, ctx, BlockType.Using);
-            return true;
         }
+
         /// <inheritdoc />
-        protected override bool HandleBreak(CodeBreakStatement obj, Context ctx)
+        protected override bool CanHandleBreak => true;
+
+        /// <inheritdoc />
+        protected override void HandleBreak(CodeBreakStatement obj, Context ctx)
         {
             ctx.Writer.Write(
                 $"Exit {ctx.VisualBasic.BlockTypeStack.First((blockType) => blockType.CanExit()).GetKeyword()}");
-            return true;
         }
 
         /// <inheritdoc />

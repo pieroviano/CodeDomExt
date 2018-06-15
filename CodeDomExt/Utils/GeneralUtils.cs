@@ -96,6 +96,29 @@ namespace CodeDomExt.Utils
         }
 
         /// <summary>
+        /// Handles a collection with the provided handler, handling each object on a single line mantaining the current
+        /// level of indentation, ending with a new line.
+        /// </summary>
+        /// <param name="coll"></param>
+        /// <param name="handler"></param>
+        /// <param name="ctx"></param>
+        /// <param name="doIndentAsPreAction">If it is set to true line indentation is handled as pre-action,
+        /// otherwise it is done as postaction, after the newline</param>
+        /// <typeparam name="T"></typeparam>
+        public static void HandleCollectionOnMultipleLines<T>(IEnumerable<T> coll, ICodeObjectHandler<T> handler,
+            Context ctx, bool doIndentAsPreAction)
+        {
+            HandleCollection(coll, handler, ctx,
+                preAction: doIndentAsPreAction ? (c) => { c.Writer.Indent(c); } : (Action<Context>) null,
+                postAction: doIndentAsPreAction ? (c) => { c.Writer.NewLine(); }
+                    : (Action<Context>) ((c) =>
+                    {
+                        c.Writer.NewLine();
+                        c.Writer.Indent(c);
+                    }), doPostActionOnLast: true);
+        }
+
+        /// <summary>
         /// Handles a code snippet; al snippet lines will begin at the current level of Indentation
         /// </summary>
         /// <param name="snippet"></param>

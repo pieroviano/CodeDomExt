@@ -9,6 +9,13 @@ namespace CodeDomExt.Generators.VisualBasic
     /// <inheritdoc />
     public class DefaultTypeMemberHandler : Common.DefaultTypeMemberHandler
     {
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public DefaultTypeMemberHandler() : base(true)
+        {
+        }
+        
         protected override bool CanHandleEvent => true;
 
         /// <inheritdoc />

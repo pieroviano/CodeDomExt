@@ -10,6 +10,8 @@ namespace CodeDomExt.Generators.VisualBasic
         /// <inheritdoc />
         public bool Handle(CodeCompileUnit obj, Context ctx)
         {
+            GeneralUtils.HandleCollectionOnMultipleLines(obj.StartDirectives.Cast<CodeDirective>(),
+                ctx.HandlerProvider.DirectiveHandler, ctx, false);
             ctx.Writer.WriteLine("Option Strict Off");
             ctx.Writer.WriteLine("Option Explicit On");
             ctx.Writer.WriteLine("Option Infer On");
@@ -28,6 +30,8 @@ namespace CodeDomExt.Generators.VisualBasic
             
             GeneralUtils.HandleCollection(obj.Namespaces.Cast<CodeNamespace>(), ctx.HandlerProvider.NamespaceHandler, ctx,
                 postAction: (c) => c.Writer.NewLine(), doPostActionOnLast: false);
+            GeneralUtils.HandleCollectionOnMultipleLines(obj.EndDirectives.Cast<CodeDirective>(),
+                ctx.HandlerProvider.DirectiveHandler, ctx, true);
             return true;
         }
     }

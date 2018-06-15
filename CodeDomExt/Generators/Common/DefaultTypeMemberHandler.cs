@@ -1,4 +1,5 @@
-﻿using System.CodeDom;
+﻿using System;
+using System.CodeDom;
 using System.Linq;
 using System.Reflection;
 using CodeDomExt.Nodes;
@@ -19,7 +20,11 @@ namespace CodeDomExt.Generators.Common
     {
         private readonly bool _handleSnippet;
         
-        protected DefaultTypeMemberHandler(bool handleSnippet = true)
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="handleSnippet"></param>
+        protected DefaultTypeMemberHandler(bool handleSnippet)
         {
             _handleSnippet = handleSnippet;
         }
@@ -46,12 +51,12 @@ namespace CodeDomExt.Generators.Common
         protected abstract void HandleEvent(CodeMemberEvent obj, Context ctx);
         private bool HandleDynamic(CodeMemberEvent obj, Context ctx)
         {
-            if (!CanHandleEvent) return false;
-            HandleCommentsAndAttributes(obj, ctx);
-            ctx.TypeMemberStack.Push(MemberTypes.Event);
-            HandleEvent(obj, ctx);
-            ctx.TypeMemberStack.Pop();
-            return true;
+            return HandleIfTrue(() =>
+            {
+                ctx.TypeMemberStack.Push(MemberTypes.Event);
+                HandleEvent(obj, ctx);
+                ctx.TypeMemberStack.Pop();
+            }, obj, ctx, CanHandleEvent);
         }
 
         /// <summary>
@@ -63,21 +68,21 @@ namespace CodeDomExt.Generators.Common
             CodeMemberPropertyExt objExt, bool doDefaultImplementation);
         private bool HandleDynamic(CodeMemberProperty obj, Context ctx)
         {
-            if (!CanHandleProperty) return false;
-            HandleCommentsAndAttributes(obj, ctx);
-            ctx.TypeMemberStack.Push(MemberTypes.Property);
-            CodeMemberPropertyExt objExt = null;
-            bool isExt = false;
-            if (obj is CodeMemberPropertyExt tmp)
+            return HandleIfTrue(() =>
             {
-                objExt = tmp;
-                isExt = true;
-            }
+                ctx.TypeMemberStack.Push(MemberTypes.Property);
+                CodeMemberPropertyExt objExt = null;
+                bool isExt = false;
+                if (obj is CodeMemberPropertyExt tmp)
+                {
+                    objExt = tmp;
+                    isExt = true;
+                }
 
-            bool doDefaultImplementation = obj.GetStatements.Count == 0 && obj.SetStatements.Count == 0;
-            HandleProperty(obj, ctx, isExt, objExt, doDefaultImplementation);
-            ctx.TypeMemberStack.Pop();
-            return true;
+                bool doDefaultImplementation = obj.GetStatements.Count == 0 && obj.SetStatements.Count == 0;
+                HandleProperty(obj, ctx, isExt, objExt, doDefaultImplementation);
+                ctx.TypeMemberStack.Pop();
+            }, obj, ctx, CanHandleProperty);
         }
 
         /// <summary>
@@ -88,12 +93,12 @@ namespace CodeDomExt.Generators.Common
         protected abstract void HandleField(CodeMemberField obj, Context ctx);
         private bool HandleDynamic(CodeMemberField obj, Context ctx)
         {
-            if (!CanHandleField) return false;
-            HandleCommentsAndAttributes(obj, ctx);
-            ctx.TypeMemberStack.Push(MemberTypes.Field);
-            HandleField(obj, ctx);
-            ctx.TypeMemberStack.Pop();
-            return true;
+            return HandleIfTrue(() =>
+            {
+                ctx.TypeMemberStack.Push(MemberTypes.Field);
+                HandleField(obj, ctx);
+                ctx.TypeMemberStack.Pop();
+            }, obj, ctx, CanHandleField);
         }
 
         /// <summary>
@@ -104,12 +109,12 @@ namespace CodeDomExt.Generators.Common
         protected abstract void HandleMethod(CodeMemberMethod obj, Context ctx);
         private bool HandleDynamic(CodeMemberMethod obj, Context ctx)
         {
-            if (!CanHandleMethod) return false;
-            HandleCommentsAndAttributes(obj, ctx);
-            ctx.TypeMemberStack.Push(MemberTypes.Method);
-            HandleMethod(obj, ctx);
-            ctx.TypeMemberStack.Pop();
-            return true;
+            return HandleIfTrue(() =>
+            {
+                ctx.TypeMemberStack.Push(MemberTypes.Method);
+                HandleMethod(obj, ctx);
+                ctx.TypeMemberStack.Pop();
+            }, obj, ctx, CanHandleMethod);
         }
         
         /// <summary>
@@ -120,12 +125,12 @@ namespace CodeDomExt.Generators.Common
         protected abstract void HandleConstructor(CodeConstructor obj, Context ctx);
         private bool HandleDynamic(CodeConstructor obj, Context ctx)
         {
-            if (!CanHandleConstructor) return false;
-            HandleCommentsAndAttributes(obj, ctx);
-            ctx.TypeMemberStack.Push(MemberTypes.Constructor);
-            HandleConstructor(obj, ctx);
-            ctx.TypeMemberStack.Pop();
-            return true;
+            return HandleIfTrue(() =>
+            {
+                ctx.TypeMemberStack.Push(MemberTypes.Constructor);
+                HandleConstructor(obj, ctx);
+                ctx.TypeMemberStack.Pop();
+            }, obj, ctx, CanHandleConstructor);
         }
         
         /// <summary>
@@ -136,12 +141,12 @@ namespace CodeDomExt.Generators.Common
         protected abstract void HandleTypeConstructor(CodeTypeConstructor obj, Context ctx);
         private bool HandleDynamic(CodeTypeConstructor obj, Context ctx)
         {
-            if (!CanHandleTypeConstructor) return false;
-            HandleCommentsAndAttributes(obj, ctx);
-            ctx.TypeMemberStack.Push(MemberTypes.Method);
-            HandleTypeConstructor(obj, ctx);
-            ctx.TypeMemberStack.Pop();
-            return true;
+            return HandleIfTrue(() =>
+            {
+                ctx.TypeMemberStack.Push(MemberTypes.Method);
+                HandleTypeConstructor(obj, ctx);
+                ctx.TypeMemberStack.Pop();
+            }, obj, ctx, CanHandleTypeConstructor);
         }
 
         /// <summary>
@@ -152,40 +157,55 @@ namespace CodeDomExt.Generators.Common
         protected abstract void HandleMain(CodeEntryPointMethod obj, Context ctx);
         private bool HandleDynamic(CodeEntryPointMethod obj, Context ctx)
         {
-            if (!CanHandleEntryPoint) return false;
-            HandleCommentsAndAttributes(obj, ctx);
-            ctx.TypeMemberStack.Push(MemberTypes.Method);
-            HandleMain(obj, ctx);
-            ctx.TypeMemberStack.Pop();
-            return true;
+            return HandleIfTrue(() =>
+            {
+                ctx.TypeMemberStack.Push(MemberTypes.Method);
+                HandleMain(obj, ctx);
+                ctx.TypeMemberStack.Pop();
+            }, obj, ctx, CanHandleEntryPoint);
         }
         
         private bool HandleDynamic(CodeSnippetTypeMember obj, Context ctx)
         {
-            if (!_handleSnippet) return false;
-            GeneralUtils.HandleSnippet(obj.Text, ctx);
-            ctx.Writer.NewLine();
-            return true;
+            return HandleIfTrue(() =>
+            {
+                GeneralUtils.HandleSnippet(obj.Text, ctx);
+                ctx.Writer.NewLine();
+            }, obj, ctx, _handleSnippet);
         }
 
-        private void HandleCommentsAndAttributes(CodeTypeMember obj, Context ctx)
+        private bool HandleIfTrue(Action handle, CodeTypeMember obj, Context ctx, bool condition)
         {
-            foreach (CodeCommentStatement comment in obj.Comments)
+            if (condition)
             {
-                ctx.HandlerProvider.StatementHandler.Handle(comment, ctx);
-                ctx.Writer.Indent(ctx);
+                //handle start directives
+                GeneralUtils.HandleCollectionOnMultipleLines(obj.StartDirectives.Cast<CodeDirective>(),
+                    ctx.HandlerProvider.DirectiveHandler, ctx, false);
+                //handle comment
+                foreach (CodeCommentStatement comment in obj.Comments)
+                {
+                    ctx.HandlerProvider.StatementHandler.Handle(comment, ctx);
+                    ctx.Writer.Indent(ctx);
+                }
+                //handle attributes
+                if (obj.CustomAttributes.Count > 0)
+                {
+                    GeneralUtils.HandleCollection(obj.CustomAttributes.Cast<CodeAttributeDeclaration>(),
+                        ctx.HandlerProvider.AttributeDeclarationHandler, ctx,
+                        postAction: (c) =>
+                        {
+                            c.Writer.NewLine();
+                            c.Writer.Indent(c);
+                        }, doPostActionOnLast: true);
+                }
+                //handle member
+                handle();
+                //handle end directives
+                GeneralUtils.HandleCollectionOnMultipleLines(obj.EndDirectives.Cast<CodeDirective>(),
+                    ctx.HandlerProvider.DirectiveHandler, ctx, true);
             }
 
-            if (obj.CustomAttributes.Count > 0)
-            {
-                GeneralUtils.HandleCollection(obj.CustomAttributes.Cast<CodeAttributeDeclaration>(),
-                    ctx.HandlerProvider.AttributeDeclarationHandler, ctx,
-                    postAction: (c) =>
-                    {
-                        c.Writer.NewLine();
-                        c.Writer.Indent(c);
-                    }, doPostActionOnLast: true);
-            }
-        }
+            return condition;
+        }        
     }
 }
