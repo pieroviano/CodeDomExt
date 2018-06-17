@@ -188,7 +188,8 @@ namespace CodeDomExt.Utils
         }
         
         /// <summary>
-        /// If the provided code expression is one of the provided types it will be wrapped in parentheses
+        /// If the provided code expression is one of the provided types or if generator option
+        /// <see cref="GeneratorOptions.RemoveRedundantParenthesis"/> is false it will be wrapped in parentheses
         /// </summary>
         /// <param name="obj"></param>
         /// <param name="ctx"></param>
@@ -199,7 +200,8 @@ namespace CodeDomExt.Utils
         }
 
         /// <summary>
-        /// If the provided code expression is one of the provided types it will be wrapped with the provided strings
+        /// If the provided code expression is one of the provided types or if generator option
+        /// <see cref="GeneratorOptions.RemoveRedundantParenthesis"/> is false it will be wrapped with the provided strings
         /// </summary>
         /// <param name="obj"></param>
         /// <param name="ctx"></param>
@@ -209,8 +211,12 @@ namespace CodeDomExt.Utils
         public static void WrapIfIsTypeAndHandle(CodeExpression obj, Context ctx, IEnumerable<Type> types, 
             string preHandleWrapString = "(", string postHandleWrapString = ")")
         {
-            Type objType = obj.GetType();
-            bool needsWrapping = types.Any((type) => type.IsAssignableFrom(objType));
+            bool needsWrapping = true;
+            
+            if (ctx.Options.RemoveRedundantParenthesis) {
+                Type objType = obj.GetType();
+                needsWrapping = types.Any((type) => type.IsAssignableFrom(objType));
+            }
             
             if (needsWrapping)
             {

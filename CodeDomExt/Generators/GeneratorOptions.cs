@@ -37,5 +37,9 @@ namespace CodeDomExt.Generators
         /// built-in/keyword types)
         /// </summary>
         public bool AlwaysUseFullyQualifiedName { get; set; } = false;
+        /// <summary>
+        /// If true the generator will try to avoid outputting redundant parenthesis 
+        /// </summary>
+        public bool RemoveRedundantParenthesis { get; set; } = true;
     }
 }

@@ -108,6 +108,7 @@
     <Compile Include="Nodes\CodeForEachStatement.cs" />
     <Compile Include="Nodes\CodeLambdaDeclarationExpression.cs" />
     <Compile Include="Nodes\CodeMultidimensionalArrayCreateExpression.cs" />
+    <Compile Include="Nodes\CodeNamespaceImportExt.cs" />
     <Compile Include="Nodes\CodeObjectCreateExpressionExt.cs" />
     <Compile Include="Nodes\CodeOperationAssignmentStatement.cs" />
     <Compile Include="Nodes\CodeBinaryOperatorExpressionMore.cs" />
