@@ -145,11 +145,17 @@ namespace CodeDomExt.Generators.Csharp
             ctx.Writer.Write(")");
             return true;
         }
+        
         /// <inheritdoc/>
-        protected override string GetDirectionKeyword(FieldDirection direction)
+        protected override bool HandleDynamic(CodeDirectionExpression obj, Context ctx)
         {
-            return CSharpKeywordsUtils.DirectionKeyword(direction);
+            if (obj.Direction != FieldDirection.In) {
+                ctx.Writer.Write($"{CSharpKeywordsUtils.DirectionKeyword(obj.Direction)} ");
+            }
+            ctx.HandlerProvider.ExpressionHandler.Handle(obj.Expression, ctx);
+            return true;
         }
+        
         /// <inheritdoc/>
         protected override bool HandleDynamic(CodeObjectCreateExpression obj, Context ctx)
         {
@@ -365,7 +371,7 @@ namespace CodeDomExt.Generators.Csharp
 
             protected override void HandleString(string str, Context ctx)
             {
-                ctx.Writer.Write("\"" + str + "\"");
+                ctx.Writer.Write("\"" + GeneralUtils.EscapeString(str, '\\', '"', '\\') + "\"");
             }
 
             protected override void HandleBoolean(bool b, Context ctx)

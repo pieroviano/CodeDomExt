@@ -44,7 +44,7 @@ namespace CodeDomExt.Nodes
         /// <param name="initializerExpression"></param>
         public CodeMultidimensionalArrayCreateExpression(CodeTypeReference createType, 
             int rank, CodeArrayInitializerExpression initializerExpression) 
-            : this(createType, rank, Array.Empty<CodeExpression>(), initializerExpression)
+            : this(createType, rank, new CodeExpression[] { }, initializerExpression)
         {
         }
 

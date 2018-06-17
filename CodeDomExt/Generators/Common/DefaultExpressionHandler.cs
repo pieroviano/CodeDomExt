@@ -53,23 +53,6 @@ namespace CodeDomExt.Generators.Common
         }
 
         /// <summary>
-        /// Return the keyword representing the specified field direction in the current language or null
-        /// </summary>
-        /// <param name="direction"></param>
-        /// <returns></returns>
-        protected abstract string GetDirectionKeyword(FieldDirection direction);
-        private bool HandleDynamic(CodeDirectionExpression obj, Context ctx)
-        {
-            if (string.IsNullOrEmpty(GetDirectionKeyword(obj.Direction)))
-            {
-                return false;
-            }
-            ctx.Writer.Write($"{GetDirectionKeyword(obj.Direction)} ");
-            ctx.HandlerProvider.ExpressionHandler.Handle(obj.Expression, ctx);
-            return true;
-        }
-
-        /// <summary>
         /// Return the string representing the memberAccessing operator in the current language or null
         /// </summary>
         protected abstract string MemberAccessOperator { get; }
@@ -236,5 +219,7 @@ namespace CodeDomExt.Generators.Common
         protected abstract bool HandleDynamic(CodeMethodReferenceExpression obj, Context ctx);
         /// <inheritdoc cref="ICodeObjectHandler{T}.Handle"/>
         protected abstract bool HandleDynamic(CodeDefaultValueExpression obj, Context ctx);
+        /// <inheritdoc cref="ICodeObjectHandler{T}.Handle"/>
+        protected abstract bool HandleDynamic(CodeDirectionExpression obj, Context ctx);
     }
 }

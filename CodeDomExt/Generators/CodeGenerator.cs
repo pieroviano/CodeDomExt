@@ -24,10 +24,22 @@ namespace CodeDomExt.Generators
         /// Generate code from provided compile unit, outputting on provided stream writer
         /// </summary>
         /// <param name="compileUnit"></param>
-        /// <param name="streamWriter"></param>
-        public void Generate(CodeCompileUnit compileUnit, StreamWriter streamWriter)
+        /// <param name="textWriter"></param>
+        public void Generate(CodeCompileUnit compileUnit, TextWriter textWriter)
         {
-            Generate(compileUnit, new StreamWriterAdapter(streamWriter));
+            Generate(compileUnit, new TextWriterAdapter(textWriter));
+        }
+
+        /// <summary>
+        /// Generate code from provided compile unit and returns it as a string
+        /// </summary>
+        /// <param name="compileUnit"></param>
+        /// <returns></returns>
+        public string GenerateString(CodeCompileUnit compileUnit)
+        {
+            StringCodeWriter codeWriter = new StringCodeWriter();
+            Generate(compileUnit, codeWriter);
+            return codeWriter.GeneratedCode;
         }
     }
 }

@@ -22,7 +22,7 @@ namespace CodeDomExt.Helpers
         /// <returns></returns>
         public static CodeConditionStatement New(params Tuple<CodeExpression, IEnumerable<CodeStatement>>[] conditions)
         {
-            return New(Array.Empty<CodeStatement>(), conditions);
+            return New(new CodeStatement[] { }, conditions);
         }
 
         /// <summary>

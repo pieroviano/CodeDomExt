@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Immutable;
 using System.IO;
 using System.Text;
 
@@ -65,32 +66,32 @@ namespace CodeDomExt.Generators
             self.NewLine();
         }
     }
-    
+
     /// <summary>
-    /// A class that adapts a <see cref="StreamWriter"/> to be used as <see cref="ICodeWriter"/>
+    /// A class that adapts a <see cref="T:System.IO.TextWriter" /> to be used as <see cref="T:CodeDomExt.Generators.ICodeWriter" />
     /// </summary>
-    public class StreamWriterAdapter : ICodeWriter
+    public class TextWriterAdapter : ICodeWriter
     {
-        private readonly StreamWriter _sw;
+        private readonly TextWriter _tw;
 
         /// <summary>
         /// </summary>
-        /// <param name="sw">The <see cref="StreamWriter"/> that will be used to output code</param>
-        public StreamWriterAdapter(StreamWriter sw)
+        /// <param name="tw">The <see cref="TextWriter"/> that will be used to output code</param>
+        public TextWriterAdapter(TextWriter tw)
         {
-            _sw = sw;
+            _tw = tw;
         }
 
         /// <inheritdoc/>
         public void Write(string str)
         {
-            _sw.Write(str);
+            _tw.Write(str);
         }
 
         /// <inheritdoc/>
         public void NewLine()
         {
-            _sw.WriteLine();
+            _tw.WriteLine();
         }
 
         /// <inheritdoc/>
@@ -101,7 +102,76 @@ namespace CodeDomExt.Generators
             {
                 sb.Append(ctx.Options.IndentString);
             }
-            _sw.Write(sb.ToString());
+            _tw.Write(sb.ToString());
+        }
+    }
+
+    /// <summary>
+    /// A code writer which writes the code to a string
+    /// </summary>
+    public class StringCodeWriter : ICodeWriter
+    {
+        private readonly StringBuilder _builder = new StringBuilder();
+        private readonly string _newLine;
+        private bool _needsUpdate = false;
+        private string _generatedCode = "";
+
+        /// <summary>
+        /// Create a new StringCodeWriter using the default environment newLine string
+        /// </summary>
+        /// <param name="newLine"></param>
+        public StringCodeWriter()
+        {
+            _newLine = Environment.NewLine;
+        }
+
+        /// <summary>
+        /// Create a new StringCodeWriter using the provided newLine string
+        /// </summary>
+        /// <param name="newLine"></param>
+        public StringCodeWriter(string newLine)
+        {
+            _newLine = newLine;
+        }
+        
+        /// <inheritdoc />
+        public void Write(string str)
+        {
+            _needsUpdate = true;
+            _builder.Append(str);
+        }
+
+        /// <inheritdoc />
+        public void NewLine()
+        {
+            _needsUpdate = true;
+            _builder.Append(_newLine);
+        }
+
+        /// <inheritdoc />
+        public void Indent(Context ctx)
+        {
+            _needsUpdate = true;
+            for (int i = 0; i < ctx.Indentation; i++)
+            {
+                _builder.Append(ctx.Options.IndentString);
+            }
+        }
+
+        /// <summary>
+        /// Returns a string representing the generated code
+        /// </summary>
+        public string GeneratedCode
+        {
+            get
+            {
+                if (_needsUpdate)
+                {
+                    _needsUpdate = false;
+                    _generatedCode = _builder.ToString();
+                }
+                return _generatedCode;
+            }
         }
     }
 }

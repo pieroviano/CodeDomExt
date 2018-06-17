@@ -72,8 +72,15 @@ namespace CodeDomExt.Generators.Common
                 case uint _:
                     HandleInteger(obj.Value, typeof(uint), ctx);
                     break;
-                case long _:
-                    HandleInteger(obj.Value, typeof(long), ctx);
+                case long l:
+                    if (l >= int.MinValue && l <= int.MaxValue)
+                    {
+                        HandleInteger(obj.Value, typeof(int), ctx);
+                    }
+                    else
+                    {
+                        HandleInteger(obj.Value, typeof(long), ctx);    
+                    }
                     break;
                 case ulong _:
                     HandleInteger(obj.Value, typeof(ulong), ctx);

@@ -46,14 +46,14 @@ namespace CodeDomExt.Nodes
         /// </summary>
         /// <param name="statements"></param>
         public CodeLambdaDeclarationExpression(params CodeStatement[] statements)
-            : this(Array.Empty<CodeLambdaParameterDeclarationExpression>(), statements)
+            : this(new CodeLambdaParameterDeclarationExpression[] { }, statements)
         {
         }
         
         /// <summary>
         /// Constructor initializing an empty lambda expression
         /// </summary>
-        public CodeLambdaDeclarationExpression() : this(Array.Empty<CodeLambdaParameterDeclarationExpression>(), Array.Empty<CodeStatement>())
+        public CodeLambdaDeclarationExpression() : this(new CodeLambdaParameterDeclarationExpression[] { }, new CodeStatement[] { })
         {
         }
         /// <summary>
@@ -79,7 +79,7 @@ namespace CodeDomExt.Nodes
         /// </summary>
         /// <param name="expression"></param>
         public CodeLambdaDeclarationExpression(CodeExpression expression)
-            : this(Array.Empty<CodeLambdaParameterDeclarationExpression>(), expression)
+            : this(new CodeLambdaParameterDeclarationExpression[] { }, expression)
         {
         }
     }

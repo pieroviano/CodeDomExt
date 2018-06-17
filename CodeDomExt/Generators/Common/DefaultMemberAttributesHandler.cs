@@ -19,6 +19,8 @@ namespace CodeDomExt.Generators.Common
         public bool Handle(MemberAttributes obj, Context ctx)
         {
             ctx.IsMemberAbstract = false;
+            bool isPrivate = false;
+
             if (ctx.CurrentDeclarationType != DeclarationType.Interface)
             {
                 AccessibilityLevel accessLevel = AccessibilityLevel.Default;
@@ -38,6 +40,11 @@ namespace CodeDomExt.Generators.Common
                 {
                     ctx.Writer.Write(GetAccessibilityLevelKeyword(accessLevel, ctx));
                     ctx.Writer.Write(" ");
+                }
+
+                if (accessLevel == AccessibilityLevel.Private)
+                {
+                    isPrivate = true;
                 }
             }
 
@@ -95,7 +102,7 @@ namespace CodeDomExt.Generators.Common
                         ctx.Writer.Write(GetConstKeyword(ctx) + " ");
                     }
                 }
-                else if ((obj & MemberAttributes.ScopeMask) == MemberAttributes.Final)
+                else if ((obj & MemberAttributes.ScopeMask) == MemberAttributes.Final || isPrivate)
                 {
                     if (ctx.CurrentTypeMember != MemberTypes.Field
                         && ctx.CurrentTypeMember != MemberTypes.Event

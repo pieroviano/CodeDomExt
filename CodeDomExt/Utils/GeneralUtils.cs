@@ -2,6 +2,7 @@
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using CodeDomExt.Generators;
 
@@ -234,6 +235,30 @@ namespace CodeDomExt.Utils
         {
             int backtickpos = s.IndexOf("`", StringComparison.Ordinal);
             return backtickpos >= 0 ? s.Substring(0, backtickpos) : s;
+        }
+
+        /// <summary>
+        /// Escapes the provided string by replacing occurencies of the provided characters to be escaped with the same character preceded by the provided escape character
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="escapeCharacter"></param>
+        /// <param name="toBeEscaped"></param>
+        /// <returns></returns>
+        public static string EscapeString(string s, char escapeCharacter, params char[] toBeEscaped)
+        {
+            StringBuilder res = new StringBuilder();
+            var toEscapeAsSet = new HashSet<char>(toBeEscaped);
+            foreach (var c in s)
+            {
+                if (toEscapeAsSet.Contains(c))
+                {
+                    res.Append(escapeCharacter);
+                }
+
+                res.Append(c);
+            }
+
+            return res.ToString();
         }
     }
 }

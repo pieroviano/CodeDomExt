@@ -153,8 +153,14 @@ namespace CodeDomExt.Generators.Common
         protected abstract string LabelDefinitionSuffix { get; }
         private bool HandleDynamic(CodeLabeledStatement obj, Context ctx)
         {
-            return HandleIfTrue(() => { ctx.Writer.WriteLine($"{AsIdentifier(obj.Label)}{LabelDefinitionSuffix}"); },
-                obj, ctx, !string.IsNullOrEmpty(LabelDefinitionSuffix), false);
+            return HandleIfTrue(() => {
+                ctx.Writer.WriteLine($"{AsIdentifier(obj.Label)}{LabelDefinitionSuffix}");
+                if (obj.Statement != null)
+                {
+                    ctx.Writer.Indent(ctx);
+                    ctx.HandlerProvider.StatementHandler.Handle(obj.Statement, ctx);
+                }
+            }, obj, ctx, !string.IsNullOrEmpty(LabelDefinitionSuffix), false);
         }
 
         /// <summary>

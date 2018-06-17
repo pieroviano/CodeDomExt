@@ -142,6 +142,14 @@ namespace CodeDomExt.Generators.VisualBasic
                 new CodeCastExpression(obj.Type, new CodePrimitiveExpression(null)), ctx);
             return true;
         }
+
+        /// <inheritdoc />
+        protected override bool HandleDynamic(CodeDirectionExpression obj, Context ctx)
+        {
+            ctx.HandlerProvider.ExpressionHandler.Handle(obj.Expression, ctx);
+            return true;
+        }
+
         /// <inheritdoc />
         protected override bool HandleDynamic(CodeDelegateCreateExpression obj, Context ctx)
         {
@@ -167,11 +175,6 @@ namespace CodeDomExt.Generators.VisualBasic
                 ctx.HandlerProvider.ExpressionHandler, ctx);
             ctx.Writer.Write(")");
             return true;
-        }
-        /// <inheritdoc />
-        protected override string GetDirectionKeyword(FieldDirection direction)
-        {
-            return VisualBasicKeywordsUtils.DirectionKeyword(direction);
         }
         /// <inheritdoc />
         protected override string MemberAccessOperator { get; } = ".";
@@ -450,7 +453,7 @@ namespace CodeDomExt.Generators.VisualBasic
 
             protected override void HandleString(string str, Context ctx)
             {
-                ctx.Writer.Write("\"" + str + "\"");
+                ctx.Writer.Write("\"" + GeneralUtils.EscapeString(str, '"', '"') + "\"");
             }
 
             protected override void HandleBoolean(bool b, Context ctx)
