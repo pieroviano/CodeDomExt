@@ -15,7 +15,7 @@ namespace CodeDomExt.Generators.VisualBasic
         /// <summary>
         /// Constructor
         /// </summary>
-        public DefaultExpressionHandler() : base(true)
+        public DefaultExpressionHandler() : base(true, false)
         {
         }
 
@@ -195,8 +195,14 @@ namespace CodeDomExt.Generators.VisualBasic
             {
                 WrapIfNecessaryAndHandle(obj.TargetObject, ctx);
                 ctx.Writer.Write(".");
+                ctx.Writer.Write(obj.MethodName);
             }
-            ctx.Writer.Write(obj.MethodName.AsVbId());
+            else
+            {
+                ctx.Writer.Write(obj.MethodName.AsVbId());
+            }
+            
+            
             if (obj.TypeArguments.Count > 0)
             {
                 ctx.Writer.Write("(Of ");

@@ -325,6 +325,11 @@ namespace CodeDomExtTests
                 "Namespace Test.Namespace",
                 "    Public Class [Class]",
                 "        Private value As Integer",
+                "",
+                "        Private Sub [namespace]()",
+                "            [namespace]()",
+                "            Me.namespace()",
+                "        End Sub",
                 "    End Class",
                 "End Namespace"
             };

@@ -13,7 +13,7 @@ namespace CodeDomExt.Generators.Csharp
         /// <summary>
         /// Constructor
         /// </summary>
-        public DefaultExpressionHandler() : base(true)
+        public DefaultExpressionHandler() : base(true, true)
         {
         }
         

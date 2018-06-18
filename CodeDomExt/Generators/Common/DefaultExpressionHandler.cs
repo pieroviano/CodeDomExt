@@ -1,4 +1,5 @@
 ﻿using System.CodeDom;
+using System.Runtime;
 using CodeDomExt.Nodes;
 using CodeDomExt.Utils;
 
@@ -15,14 +16,19 @@ namespace CodeDomExt.Generators.Common
     public abstract class DefaultExpressionHandler : DynamicDispatchHandler<CodeExpression>
     {
         private readonly bool _handleSnippet;
-
+        private readonly bool _useAsIdentifierOnMemberAccess;
         /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="handleSnippet">true if snippet expression should be handled by this</param>
-        protected DefaultExpressionHandler(bool handleSnippet)
+        /// <param name="useAsIdentifierOnMemberAccess">
+        /// If true the AsIdentifier method will always be on the name of the accessed member for member access expression (i.e. field, property, method... referebces).
+        /// If false AsIdentifier will only be used when the target object of the reference is null
+        /// </param>
+        protected DefaultExpressionHandler(bool handleSnippet, bool useAsIdentifierOnMemberAccess)
         {
             _handleSnippet = handleSnippet;
+            _useAsIdentifierOnMemberAccess = useAsIdentifierOnMemberAccess;
         }
         
         /// <inheritdoc />
@@ -68,7 +74,14 @@ namespace CodeDomExt.Generators.Common
                 ctx.Writer.Write(MemberAccessOperator);
             }
 
-            ctx.Writer.Write(AsIdentifier(obj.EventName));
+            if (_useAsIdentifierOnMemberAccess || obj.TargetObject == null)
+            {
+                ctx.Writer.Write(AsIdentifier(obj.EventName));
+            }
+            else
+            {
+                ctx.Writer.Write(obj.EventName);
+            }
             return true;
         }
 
@@ -83,8 +96,14 @@ namespace CodeDomExt.Generators.Common
                 WrapAccessorTargetIfNecessaryAndHandle(obj.TargetObject, ctx);
                 ctx.Writer.Write(MemberAccessOperator);
             }
-
-            ctx.Writer.Write(AsIdentifier(obj.FieldName));
+            if (_useAsIdentifierOnMemberAccess || obj.TargetObject == null)
+            {
+                ctx.Writer.Write(AsIdentifier(obj.FieldName));
+            }
+            else
+            {
+                ctx.Writer.Write(obj.FieldName);
+            }
             return true;
         }
 
@@ -106,8 +125,14 @@ namespace CodeDomExt.Generators.Common
                 WrapAccessorTargetIfNecessaryAndHandle(obj.TargetObject, ctx);
                 ctx.Writer.Write(MemberAccessOperator);
             }
-
-            ctx.Writer.Write(AsIdentifier(obj.PropertyName));
+            if (_useAsIdentifierOnMemberAccess || obj.TargetObject == null)
+            {
+                ctx.Writer.Write(AsIdentifier(obj.PropertyName));
+            }
+            else
+            {
+                ctx.Writer.Write(obj.PropertyName);
+            }
             return true;
         }
 

@@ -620,6 +620,14 @@ namespace CodeDomExtTests
 
             classDeclaration.Members.Add(new CodeMemberField(typeof(int), "value"));
             
+            CodeMemberMethod method = new CodeMemberMethod()
+            {
+                Name = "namespace"
+            };
+            method.Statements.Add(new CodeMethodInvokeExpression(null, "namespace"));
+            method.Statements.Add(new CodeMethodInvokeExpression(new CodeThisReferenceExpression(), "namespace"));
+            classDeclaration.Members.Add(method);
+            
             compileUnit.Namespaces.Add(codeNamespace);
             codeNamespace.Types.Add(classDeclaration);
 

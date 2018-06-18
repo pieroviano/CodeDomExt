@@ -420,6 +420,12 @@ namespace CodeDomExtTests
                 "    public class Class",
                 "    {",
                 "        private int @value;",
+                "",
+                "        private void @namespace()",
+                "        {",
+                "            @namespace();",
+                "            this.@namespace();",
+                "        }",
                 "    }",
                 "}"
             };
