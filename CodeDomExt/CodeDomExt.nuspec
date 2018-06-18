@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>$id$</id>
-    <version>1.0.0</version>
+    <version>2.0.0</version>
     <title>CodeDomExt</title>
     <authors>Luca Tremamunno</authors>
     <owners>$author$</owners>
@@ -10,11 +10,11 @@
     <projectUrl>https://github.com/tremaluca/CodeDomExt</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Extendible generators for CodeDOM</description>
-    <releaseNotes>Version 1.0.0 released.</releaseNotes>
+    <releaseNotes>Version 2.0.0 released; read changelog on project's GitHub page</releaseNotes>
     <copyright>Copyright 2018</copyright>
     <tags>CodeDOM Generator</tags>
 	<dependencies>
-		<dependency id="CodeDomExt.Helpers" version="1.0.0" />
+		<dependency id="CodeDomExt.Helpers" version="1.0.1" />
 	</dependencies>
   </metadata>
 </package>
