@@ -23,7 +23,7 @@ namespace CodeDomExt.Generators.VisualBasic
                     ctx.HandlerProvider.AttributeDeclarationHandler, ctx,
                     postAction: (c) =>
                     {
-                        c.Writer.NewLine();
+                        c.Writer.WriteLine(" _");
                         c.Writer.Indent(c);
                     }, doPostActionOnLast: true);
             }

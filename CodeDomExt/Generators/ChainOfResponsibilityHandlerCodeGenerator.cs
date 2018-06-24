@@ -65,9 +65,15 @@ namespace CodeDomExt.Generators
         }
 
         /// <inheritdoc />
-        public override void Generate(CodeCompileUnit compileUnit, ICodeWriter codeWriter)
+        public override void Generate(CodeCompileUnit compileUnit, ICodeWriter codeWriter, params object[] contextExtras)
         {
-            _compileUnitHandler.Handle(compileUnit, new Context(codeWriter, _options, this));
+            Context ctx = new Context(codeWriter, _options, this);
+            foreach (var contextExtra in contextExtras)
+            {
+                ctx.AddUserData(contextExtra);
+            }
+
+            _compileUnitHandler.Handle(compileUnit, ctx);
         }
 
         /// <summary>

@@ -117,13 +117,27 @@ namespace CodeDomExt.Generators
         /// <typeparam name="T"></typeparam>
         public void AddUserData<T>(T data)
         {
+            if (!TryAddUserData(data))
+            {
+                throw new ArgumentException($"An object of type {typeof(T).FullName} is already present.");
+            };
+        }
+        
+        /// <summary>
+        /// Stores an object of type T
+        /// </summary>
+        /// <param name="data"></param>
+        /// <typeparam name="T"></typeparam>
+        /// <returns>true if no object of type T was present, so the provided object was added. False otherwise</returns>
+        public bool TryAddUserData<T>(T data)
+        {
             string key = typeof(T).FullName;
             if (_userData.ContainsKey(key))
             {
-                throw new ArgumentException($"An object of type {key} is already present.");
+                return false;
             }
-
             _userData[key] = data;
+            return true;
         }
 
         /// <summary>
