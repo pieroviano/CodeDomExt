@@ -85,12 +85,17 @@ namespace CodeDomExt.Generators.VisualBasic
         /// <inheritdoc />
         protected override void HandleFor(CodeIterationStatement obj, Context ctx)
         {
-            ctx.HandlerProvider.StatementHandler.Handle(obj.InitStatement, ctx);
+            if (obj.InitStatement != null)
+            {
+                ctx.HandlerProvider.StatementHandler.Handle(obj.InitStatement, ctx);
+            }
             ctx.Writer.Indent(ctx);
             CodeIterationStatement equivalent = new CodeIterationStatement(null, obj.TestExpression, null);
             equivalent.Statements.AddRange(obj.Statements);
-            equivalent.Statements.Add(obj.IncrementStatement);
-            HandleWhile(equivalent, ctx);
+            if (obj.IncrementStatement != null) {
+                equivalent.Statements.Add(obj.IncrementStatement);
+            }
+            ctx.HandlerProvider.StatementHandler.Handle(equivalent, ctx);
         }
         /// <inheritdoc />
         protected override string LabelDefinitionSuffix { get; } = ":";
