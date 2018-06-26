@@ -1,4 +1,5 @@
-﻿using System.CodeDom;
+﻿using System;
+using System.CodeDom;
 using System.Reflection;
 
 namespace CodeDomExt.Generators
@@ -68,9 +69,10 @@ namespace CodeDomExt.Generators
         public override void Generate(CodeCompileUnit compileUnit, ICodeWriter codeWriter, params object[] contextExtras)
         {
             Context ctx = new Context(codeWriter, _options, this);
+
             foreach (var contextExtra in contextExtras)
             {
-                ctx.AddUserData(contextExtra);
+                ctx.AddUserDataAutoType(contextExtra);
             }
 
             _compileUnitHandler.Handle(compileUnit, ctx);

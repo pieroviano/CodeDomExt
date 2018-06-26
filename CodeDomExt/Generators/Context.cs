@@ -110,7 +110,7 @@ namespace CodeDomExt.Generators
 
         private readonly IDictionary<string, object> _userData = new Dictionary<string, object>();
         /// <summary>
-        /// Stores an object of type T
+        /// Stores the provided object as an object of type T
         /// </summary>
         /// <param name="data"></param>
         /// <exception cref="ArgumentException">If an item of type T is already stored</exception>
@@ -124,7 +124,37 @@ namespace CodeDomExt.Generators
         }
         
         /// <summary>
-        /// Stores an object of type T
+        /// Stores the provided object, using its type as key
+        /// </summary>
+        /// <param name="data"></param>
+        /// <exception cref="ArgumentException">If an item of the provided is already stored</exception>
+        /// <returns>true if no object of the provided was present, so the provided object was added. False otherwise</returns>
+        public void AddUserDataAutoType(object data)
+        {
+            if (!TryAddUserDataAutoType(data))
+            {
+                throw new ArgumentException($"An object of type {data.GetType().FullName} is already present.");
+            };
+        }
+
+        /// <summary>
+        /// Stores the provided object, using its type as key
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns>true if no object of the provided was present, so the provided object was added. False otherwise</returns>
+        public bool TryAddUserDataAutoType(object data)
+        {
+            string key = data.GetType().FullName;
+            if (_userData.ContainsKey(key))
+            {
+                return false;
+            }
+            _userData[key] = data;
+            return true;
+        }
+        
+        /// <summary>
+        /// Stores the provided object as an object of type T
         /// </summary>
         /// <param name="data"></param>
         /// <typeparam name="T"></typeparam>
