@@ -53,10 +53,8 @@ namespace CodeDomExt.Generators.Common
         {
             return HandleIfTrue(() =>
             {
-                ctx.TypeMemberStack.Push(MemberTypes.Event);
                 HandleEvent(obj, ctx);
-                ctx.TypeMemberStack.Pop();
-            }, obj, ctx, CanHandleEvent);
+            }, obj, ctx, CanHandleEvent, MemberTypes.Event);
         }
 
         /// <summary>
@@ -70,7 +68,6 @@ namespace CodeDomExt.Generators.Common
         {
             return HandleIfTrue(() =>
             {
-                ctx.TypeMemberStack.Push(MemberTypes.Property);
                 CodeMemberPropertyExt objExt = null;
                 bool isExt = false;
                 if (obj is CodeMemberPropertyExt tmp)
@@ -81,8 +78,7 @@ namespace CodeDomExt.Generators.Common
 
                 bool doDefaultImplementation = obj.GetStatements.Count == 0 && obj.SetStatements.Count == 0;
                 HandleProperty(obj, ctx, isExt, objExt, doDefaultImplementation);
-                ctx.TypeMemberStack.Pop();
-            }, obj, ctx, CanHandleProperty);
+            }, obj, ctx, CanHandleProperty, MemberTypes.Property);
         }
 
         /// <summary>
@@ -95,10 +91,8 @@ namespace CodeDomExt.Generators.Common
         {
             return HandleIfTrue(() =>
             {
-                ctx.TypeMemberStack.Push(MemberTypes.Field);
                 HandleField(obj, ctx);
-                ctx.TypeMemberStack.Pop();
-            }, obj, ctx, CanHandleField);
+            }, obj, ctx, CanHandleField, MemberTypes.Field);
         }
 
         /// <summary>
@@ -111,10 +105,8 @@ namespace CodeDomExt.Generators.Common
         {
             return HandleIfTrue(() =>
             {
-                ctx.TypeMemberStack.Push(MemberTypes.Method);
                 HandleMethod(obj, ctx);
-                ctx.TypeMemberStack.Pop();
-            }, obj, ctx, CanHandleMethod);
+            }, obj, ctx, CanHandleMethod, MemberTypes.Method);
         }
         
         /// <summary>
@@ -127,10 +119,8 @@ namespace CodeDomExt.Generators.Common
         {
             return HandleIfTrue(() =>
             {
-                ctx.TypeMemberStack.Push(MemberTypes.Constructor);
                 HandleConstructor(obj, ctx);
-                ctx.TypeMemberStack.Pop();
-            }, obj, ctx, CanHandleConstructor);
+            }, obj, ctx, CanHandleConstructor, MemberTypes.Constructor);
         }
         
         /// <summary>
@@ -143,10 +133,8 @@ namespace CodeDomExt.Generators.Common
         {
             return HandleIfTrue(() =>
             {
-                ctx.TypeMemberStack.Push(MemberTypes.Method);
                 HandleTypeConstructor(obj, ctx);
-                ctx.TypeMemberStack.Pop();
-            }, obj, ctx, CanHandleTypeConstructor);
+            }, obj, ctx, CanHandleTypeConstructor, MemberTypes.Constructor);
         }
 
         /// <summary>
@@ -159,10 +147,8 @@ namespace CodeDomExt.Generators.Common
         {
             return HandleIfTrue(() =>
             {
-                ctx.TypeMemberStack.Push(MemberTypes.Method);
                 HandleMain(obj, ctx);
-                ctx.TypeMemberStack.Pop();
-            }, obj, ctx, CanHandleEntryPoint);
+            }, obj, ctx, CanHandleEntryPoint, MemberTypes.Method);
         }
         
         private bool HandleDynamic(CodeSnippetTypeMember obj, Context ctx)
@@ -171,13 +157,15 @@ namespace CodeDomExt.Generators.Common
             {
                 GeneralUtils.HandleSnippet(obj.Text, ctx);
                 ctx.Writer.NewLine();
-            }, obj, ctx, _handleSnippet);
+            }, obj, ctx, _handleSnippet, MemberTypes.Custom);
         }
 
-        private bool HandleIfTrue(Action handle, CodeTypeMember obj, Context ctx, bool condition)
+        private bool HandleIfTrue(Action handle, CodeTypeMember obj, Context ctx, bool condition, MemberTypes memberType)
         {
             if (condition)
             {
+                //handlestack
+                ctx.TypeMemberStack.Push(memberType);
                 //handle start directives
                 GeneralUtils.HandleCollectionOnMultipleLines(obj.StartDirectives.Cast<CodeDirective>(),
                     ctx.HandlerProvider.DirectiveHandler, ctx, false);
@@ -204,6 +192,8 @@ namespace CodeDomExt.Generators.Common
                 //handle end directives
                 GeneralUtils.HandleCollectionOnMultipleLines(obj.EndDirectives.Cast<CodeDirective>(),
                     ctx.HandlerProvider.DirectiveHandler, ctx, true);
+                //handle stack
+                ctx.TypeMemberStack.Pop();
             }
 
             return condition;
