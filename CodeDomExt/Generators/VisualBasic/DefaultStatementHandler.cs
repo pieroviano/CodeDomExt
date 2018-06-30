@@ -37,7 +37,6 @@ namespace CodeDomExt.Generators.VisualBasic
             HandleConditionNoBlock(obj, ctx);
             ctx.Writer.Indent(ctx);
             VisualBasicUtils.EndBlock(ctx, false);
-            ctx.Writer.NewLine();
         }
         private void HandleConditionNoBlock(CodeConditionStatement obj, Context ctx)
         {
@@ -80,7 +79,7 @@ namespace CodeDomExt.Generators.VisualBasic
         {
             ctx.Writer.Write("While ");
             ctx.HandlerProvider.ExpressionHandler.Handle(obj.TestExpression, ctx);
-            VisualBasicUtils.HandleStatementCollection(obj.Statements, ctx, BlockType.While);
+            VisualBasicUtils.HandleStatementCollection(obj.Statements, ctx, BlockType.While, false);
         }
         /// <inheritdoc />
         protected override void HandleFor(CodeIterationStatement obj, Context ctx)
@@ -88,6 +87,7 @@ namespace CodeDomExt.Generators.VisualBasic
             if (obj.InitStatement != null)
             {
                 ctx.HandlerProvider.StatementHandler.Handle(obj.InitStatement, ctx);
+                ctx.Writer.NewLine();
             }
             ctx.Writer.Indent(ctx);
             CodeIterationStatement equivalent = new CodeIterationStatement(null, obj.TestExpression, null);
@@ -140,7 +140,6 @@ namespace CodeDomExt.Generators.VisualBasic
             }
             ctx.Writer.Indent(ctx);
             VisualBasicUtils.EndBlock(ctx, false);
-            ctx.Writer.NewLine();
         }
 
         /// <inheritdoc />
@@ -181,7 +180,6 @@ namespace CodeDomExt.Generators.VisualBasic
             ctx.Unindent();
             ctx.Writer.IndentAndWrite("Loop While ", ctx);
             ctx.HandlerProvider.ExpressionHandler.Handle(obj.TestExpression, ctx);
-            ctx.Writer.NewLine();
             VisualBasicUtils.EndBlock(ctx, false, false);
         }
 
@@ -204,7 +202,7 @@ namespace CodeDomExt.Generators.VisualBasic
             ctx.Indent();
             VisualBasicUtils.HandleStatementCollection(obj.Statements, ctx);
             ctx.Unindent();
-            ctx.Writer.IndentAndWriteLine("Next", ctx);
+            ctx.Writer.IndentAndWrite("Next", ctx);
             VisualBasicUtils.EndBlock(ctx, false, false);
         }
 
@@ -222,7 +220,7 @@ namespace CodeDomExt.Generators.VisualBasic
             }
 
             ctx.HandlerProvider.ExpressionHandler.Handle(obj.InitializerExpression, ctx);
-            VisualBasicUtils.HandleStatementCollection(obj.Statements, ctx, BlockType.Using);
+            VisualBasicUtils.HandleStatementCollection(obj.Statements, ctx, BlockType.Using, false);
         }
 
         /// <inheritdoc />
@@ -238,7 +236,6 @@ namespace CodeDomExt.Generators.VisualBasic
         /// <inheritdoc />
         protected override void DoTermination(Context ctx)
         {
-            ctx.Writer.NewLine();
         }
 
         private readonly CatchClauseHandler _catchClauseHandler = new CatchClauseHandler();

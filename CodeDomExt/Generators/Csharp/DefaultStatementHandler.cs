@@ -64,9 +64,10 @@ namespace CodeDomExt.Generators.Csharp
             ctx.Writer.Write("if (");
             ctx.HandlerProvider.ExpressionHandler.Handle(obj.Condition, ctx);
             ctx.Writer.Write(")");
-            CSharpUtils.HandleStatementCollection(obj.TrueStatements, ctx);
+            CSharpUtils.HandleStatementCollection(obj.TrueStatements, ctx, true, false);
             if (obj.FalseStatements.Count > 0)
             {
+                ctx.Writer.NewLine();
                 ctx.Writer.IndentAndWrite("else", ctx);
                 if (obj.FalseStatements.Count == 1 && obj.FalseStatements[0] is CodeConditionStatement elseIf)
                 {
@@ -75,7 +76,7 @@ namespace CodeDomExt.Generators.Csharp
                 }
                 else
                 {
-                    CSharpUtils.HandleStatementCollection(obj.FalseStatements, ctx);
+                    CSharpUtils.HandleStatementCollection(obj.FalseStatements, ctx, true, false);
                 }
             }
         }
@@ -85,7 +86,7 @@ namespace CodeDomExt.Generators.Csharp
             ctx.Writer.Write("while (");
             ctx.HandlerProvider.ExpressionHandler.Handle(obj.TestExpression, ctx);
             ctx.Writer.Write(")");
-            CSharpUtils.HandleStatementCollection(obj.Statements, ctx);
+            CSharpUtils.HandleStatementCollection(obj.Statements, ctx, true, false);
         }
         /// <inheritdoc/>
         protected override void HandleFor(CodeIterationStatement obj, Context ctx)
@@ -105,7 +106,7 @@ namespace CodeDomExt.Generators.Csharp
             }
             ctx.Writer.Write(")");
             ctx.StatementShouldTerminate = true;
-            CSharpUtils.HandleStatementCollection(obj.Statements, ctx);
+            CSharpUtils.HandleStatementCollection(obj.Statements, ctx, true, false);
         }
         /// <inheritdoc/>
         protected override bool CanHandleRemoveEvent => true;
@@ -126,11 +127,11 @@ namespace CodeDomExt.Generators.Csharp
             ctx.Writer.Write("try");
             CSharpUtils.HandleStatementCollection(obj.TryStatements, ctx);
             GeneralUtils.HandleCollection(obj.CatchClauses.Cast<CodeCatchClause>(), _catchClauseHandler, ctx,
-                preAction: (c) => c.Writer.Indent(c));
+                preAction: (c) => c.Writer.Indent(c), postAction: (c) => c.Writer.NewLine(), doPostActionOnLast: false);
             if (obj.FinallyStatements.Count > 0)
             {
                 ctx.Writer.Write("finally");
-                CSharpUtils.HandleStatementCollection(obj.FinallyStatements, ctx);
+                CSharpUtils.HandleStatementCollection(obj.FinallyStatements, ctx, true, false);
             }
         }
         /// <inheritdoc/>
@@ -160,7 +161,7 @@ namespace CodeDomExt.Generators.Csharp
             ctx.Unindent();
             ctx.Writer.IndentAndWrite("} while (", ctx);
             ctx.HandlerProvider.ExpressionHandler.Handle(obj.TestExpression, ctx);
-            ctx.Writer.WriteLine(");");
+            ctx.Writer.Write(");");
         }
         /// <inheritdoc/>
         protected override bool CanHandleForEach => true;
@@ -174,7 +175,7 @@ namespace CodeDomExt.Generators.Csharp
             ctx.HandlerProvider.ExpressionHandler.Handle(obj.ObjectToIterate, ctx);
             ctx.Writer.Write(")");
 
-            CSharpUtils.HandleStatementCollection(obj.Statements, ctx);
+            CSharpUtils.HandleStatementCollection(obj.Statements, ctx, true, false);
         }
         /// <inheritdoc/>
         protected override bool CanHandleUsing => true;
@@ -187,7 +188,7 @@ namespace CodeDomExt.Generators.Csharp
             ctx.Writer.Write($" {obj.VariableName.AsCsId()} = ");
             ctx.HandlerProvider.ExpressionHandler.Handle(obj.InitializerExpression, ctx);
             ctx.Writer.Write(")");
-            CSharpUtils.HandleStatementCollection(obj.Statements, ctx);
+            CSharpUtils.HandleStatementCollection(obj.Statements, ctx, true, false);
         }
         /// <inheritdoc/>
         protected override bool CanHandleBreak => true;
@@ -201,7 +202,7 @@ namespace CodeDomExt.Generators.Csharp
         /// <inheritdoc />
         protected override void DoTermination(Context ctx)
         {
-            ctx.Writer.WriteLine(";");
+            ctx.Writer.Write(";");
         }
 
         private void WriteTypeOrVar(CodeTypeReference type, Context ctx)
@@ -227,7 +228,7 @@ namespace CodeDomExt.Generators.Csharp
                     ctx.Writer.Write($" {obj.LocalName.AsCsId()}");
                 }
                 ctx.Writer.Write(")");
-                CSharpUtils.HandleStatementCollection(obj.Statements, ctx);
+                CSharpUtils.HandleStatementCollection(obj.Statements, ctx, true, false);
                 return true;
             }
         }

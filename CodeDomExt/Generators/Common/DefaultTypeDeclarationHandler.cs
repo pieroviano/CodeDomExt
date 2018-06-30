@@ -31,6 +31,7 @@ namespace CodeDomExt.Generators.Common
             foreach (CodeCommentStatement comment in obj.Comments)
             {
                 ctx.HandlerProvider.StatementHandler.Handle(comment, ctx);
+                ctx.Writer.NewLine();
                 ctx.Writer.Indent(ctx);
             }
             

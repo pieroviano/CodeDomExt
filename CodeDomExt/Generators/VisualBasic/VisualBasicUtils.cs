@@ -79,32 +79,43 @@ namespace CodeDomExt.Generators.VisualBasic
         /// <param name="ctx"></param>
         public static void HandleStatementCollection(CodeStatementCollection coll, Context ctx)
         {
-            HandleStatementCollection(coll, ctx, null);
+            HandleStatementCollection(coll, ctx, null, true);
         }
-        
+
         /// <summary>
         /// Creates a new block and handles a statement collection
         /// </summary>
         /// <param name="coll"></param>
         /// <param name="ctx"></param>
         /// <param name="blockType"></param>
-        public static void HandleStatementCollection(CodeStatementCollection coll, Context ctx, BlockType blockType)
+        /// <param name="endWithNewLine"></param>
+        public static void HandleStatementCollection(CodeStatementCollection coll, Context ctx, BlockType blockType, bool endWithNewLine = true)
         {
-            HandleStatementCollection(coll, ctx, (BlockType?) blockType);
+            HandleStatementCollection(coll, ctx, (BlockType?) blockType, endWithNewLine);
         }
 
         // ReSharper disable once SuggestBaseTypeForParameter
-        private static void HandleStatementCollection(CodeStatementCollection coll, Context ctx, BlockType? blockType)
+        private static void HandleStatementCollection(CodeStatementCollection coll, Context ctx, BlockType? blockType, bool endWithNewLine)
         {
             if (blockType != null)
             {
                 BeginBlock((BlockType) blockType, ctx);
             }
             GeneralUtils.HandleCollection(coll.Cast<CodeStatement>(), ctx.HandlerProvider.StatementHandler, ctx,
-                preAction: (c) => c.Writer.Indent(c));
+                preAction: (c) => c.Writer.Indent(c),
+                postAction: (c) => c.Writer.NewLine(), doPostActionOnLast: true);
             if (blockType != null)
             {
-                EndBlock(ctx);
+                if (endWithNewLine)
+                {
+                    EndBlock(ctx);
+                }
+                else
+                {
+                    ctx.Unindent();
+                    ctx.Writer.Indent(ctx);
+                    EndBlock(ctx, false);
+                }
             }
         } 
     }

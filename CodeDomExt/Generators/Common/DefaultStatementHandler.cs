@@ -52,7 +52,6 @@ namespace CodeDomExt.Generators.Common
                 () =>
                 {
                     ctx.HandlerProvider.CommentHandler.Handle(obj.Comment, ctx);
-                    ctx.Writer.NewLine();
                 }, obj, ctx, _handleComment, false);
         }
 
@@ -237,7 +236,6 @@ namespace CodeDomExt.Generators.Common
             return HandleIfTrue(() =>
             {
                 GeneralUtils.HandleSnippet(obj.Value, ctx);
-                ctx.Writer.NewLine();
             }, obj, ctx, _handleSnippet, false);
         }
 
@@ -326,8 +324,9 @@ namespace CodeDomExt.Generators.Common
                 {
                     DoTermination(ctx);
                 }
-                GeneralUtils.HandleCollectionOnMultipleLines(obj.EndDirectives.Cast<CodeDirective>(),
-                    ctx.HandlerProvider.DirectiveHandler, ctx, true);
+                GeneralUtils.HandleCollection(obj.EndDirectives.Cast<CodeDirective>(),
+                    ctx.HandlerProvider.DirectiveHandler, ctx,
+                    preAction: (c) => {c.Writer.NewLine(); c.Writer.Indent(c);});
             }
 
             return condition;

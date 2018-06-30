@@ -202,8 +202,8 @@ namespace CodeDomExtTests
             string[] expected =
             {
                 "Namespace Test.Namespace",
-                "    <Attribute1>",
-                "    <Attribute2(1, Value:=2)>",
+                "    <Attribute1> _",
+                "    <Attribute2(1, Value:=2)> _",
                 "    Public Class TestClass(Of T)",
                 "        <Attribute1>",
                 "        Private a As Integer",
