@@ -266,5 +266,16 @@ namespace CodeDomExt.Utils
 
             return res.ToString();
         }
+
+        /// <summary>
+        /// Returns if the provided statement is null or an empty code snippet
+        /// </summary>
+        /// <param name="statement"></param>
+        /// <returns></returns>
+        public static bool IsNullOrEmptySnippet(CodeStatement statement)
+        {
+            return statement == null ||
+                   (statement is CodeSnippetStatement snippet && string.IsNullOrEmpty(snippet.Value));
+        }
     }
 }

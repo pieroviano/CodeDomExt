@@ -1,6 +1,6 @@
 ﻿using System;
 using System.CodeDom;
-using System.Collections.Immutable;
+using System.Collections.Generic;
 using System.Linq;
 using CodeDomExt.Utils;
 
@@ -152,9 +152,10 @@ namespace CodeDomExt.Generators.VisualBasic
     /// </summary>
     public static class BlockTypeExtension
     {
-        private static readonly ImmutableHashSet<BlockType> CanExitBlockTypes = ImmutableHashSet.Create(
+        private static readonly ISet<BlockType> CanExitBlockTypes = new HashSet<BlockType>(
+            new [] {
             BlockType.Do, BlockType.For, BlockType.Function, BlockType.Property, BlockType.Select, BlockType.Sub,
-            BlockType.Try, BlockType.While 
+            BlockType.Try, BlockType.While }
         ); 
         
         /// <summary>

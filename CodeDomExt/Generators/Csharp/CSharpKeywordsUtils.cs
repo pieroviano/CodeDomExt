@@ -1,6 +1,6 @@
 ﻿using System;
 using System.CodeDom;
-using System.Collections.Immutable;
+using System.Collections.Generic;
 using CodeDomExt.Helpers;
 using CodeDomExt.Utils;
 
@@ -11,7 +11,8 @@ namespace CodeDomExt.Generators.Csharp
     /// </summary>
     public static class CSharpKeywordsUtils
     {
-        private static readonly ImmutableHashSet<string> Keywords = ImmutableHashSet.Create(
+        private static readonly ISet<string> Keywords = new HashSet<string>(
+            new string[] {
             //always keyword
             "abstract", "as", "base", "bool", "break", "byte", "case", "catch", "char", "checked", "class", "const",
             "continue", "decimal", "default", "delegate", "do", "double", "else", "enum", "event", "explicit", "extern",
@@ -25,6 +26,7 @@ namespace CodeDomExt.Generators.Csharp
             "add", "alias", "ascending", "async", "await", "descending", "dynamic", "from", "get", "global", "group",
             "into", "join", "let", "nameof", "orderby", "partial", "partial", "remove", "select",
             "set", "value", "var", "when", "where", "where", "yield"
+            }
         );
 
         /// <summary>

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.CodeDom;
-using System.Collections.Immutable;
+using System.Collections.Generic;
 using System.Linq;
 using CodeDomExt.Helpers;
 using CodeDomExt.Utils;
@@ -12,8 +12,8 @@ namespace CodeDomExt.Generators.VisualBasic
     /// </summary>
     public static class VisualBasicKeywordsUtils
     {
-        private static readonly ImmutableHashSet<string> Keywords = ImmutableHashSet.Create(
-            new[] {
+        private static readonly ISet<string> Keywords = new HashSet<string>(
+            new string[] {
             "AddHandler", "AddressOf", "Alias", "And", "AndAlso", "As", "Boolean", "ByRef", "Byte", "ByVal", "Call",
             "Case", "Catch", "CBool", "CByte", "CChar", "CDate", "CDbl", "CDec", "Char", "CInt", "Class", "CLng",
             "CObj", "Const", "Continue", "CSByte", "CShort", "CSng", "CStr", "CType", "CUInt", "CULng", "CUShort",

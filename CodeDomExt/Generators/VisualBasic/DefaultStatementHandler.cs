@@ -84,7 +84,7 @@ namespace CodeDomExt.Generators.VisualBasic
         /// <inheritdoc />
         protected override void HandleFor(CodeIterationStatement obj, Context ctx)
         {
-            if (obj.InitStatement != null)
+            if (!GeneralUtils.IsNullOrEmptySnippet(obj.InitStatement))
             {
                 ctx.HandlerProvider.StatementHandler.Handle(obj.InitStatement, ctx);
                 ctx.Writer.NewLine();
@@ -92,7 +92,7 @@ namespace CodeDomExt.Generators.VisualBasic
             ctx.Writer.Indent(ctx);
             CodeIterationStatement equivalent = new CodeIterationStatement(null, obj.TestExpression, null);
             equivalent.Statements.AddRange(obj.Statements);
-            if (obj.IncrementStatement != null) {
+            if (!GeneralUtils.IsNullOrEmptySnippet(obj.IncrementStatement)) {
                 equivalent.Statements.Add(obj.IncrementStatement);
             }
             ctx.HandlerProvider.StatementHandler.Handle(equivalent, ctx);

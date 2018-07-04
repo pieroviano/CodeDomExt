@@ -135,7 +135,7 @@ namespace CodeDomExt.Generators.Common
         protected abstract void HandleFor(CodeIterationStatement obj, Context ctx);
         private bool HandleDynamic(CodeIterationStatement obj, Context ctx)
         {
-            if (obj.InitStatement == null && obj.IncrementStatement == null)
+            if (GeneralUtils.IsNullOrEmptySnippet(obj.InitStatement) && GeneralUtils.IsNullOrEmptySnippet(obj.IncrementStatement))
             {
                 return HandleIfTrue(() => { HandleWhile(obj, ctx); }, obj, ctx, CanHandleWhile, false);
 

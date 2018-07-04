@@ -1,3 +1,12 @@
+## [2.2.0] - 04/07/2018
+
+### Changed
+- Removed newline after statements
+
+### Fixed
+- Common.DefaultTypeMemberHandler stack handling
+- Iterations are now handled as while also when the init and increment statements are empty CodeSnippettStatement
+
 ## [2.1.0] - 26/06/2018
 
 ### Added
