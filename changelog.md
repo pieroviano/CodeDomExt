@@ -1,3 +1,12 @@
+## [2.1.0] - 26/06/2018
+
+### Added
+- Can now add extra context object when calling Generate methods
+
+### Fixed
+- VB generator not addin "_" after custom attributes in type declaration
+- VB for handling
+
 ## [2.0.0] - 18/06/2018
 Warning: This version may break some of your custom ICodeObjectHandler. If you were only using default implementations nothing should have been broken.
 
