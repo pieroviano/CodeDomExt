@@ -40,7 +40,7 @@ namespace CodeDomExt.Generators.Common
             
             //since i'm doing going to do some common handling i must be sure i can handle the whole object; checked in the single handledynamics 
 
-            return HandleDynamic(obj as dynamic, ctx);
+            return HandleDynamic(obj as CodeMemberEvent, ctx);
         }
 
         /// <summary>

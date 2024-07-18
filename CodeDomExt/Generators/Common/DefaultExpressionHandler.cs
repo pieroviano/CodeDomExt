@@ -34,7 +34,7 @@ namespace CodeDomExt.Generators.Common
         /// <inheritdoc />
         protected override bool DoDynamicHandle(CodeExpression obj, Context ctx)
         {
-           return HandleDynamic(obj as dynamic, ctx);
+           return HandleDynamic(obj as CodeBinaryOperatorExpression, ctx);
         }
 
         /// <summary>

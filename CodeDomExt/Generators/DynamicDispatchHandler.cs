@@ -1,10 +1,10 @@
-﻿using Microsoft.CSharp.RuntimeBinder;
+﻿using System;
 
 namespace CodeDomExt.Generators
 {
     /// <summary>
     /// A partial implementation of an handler; the handle method delegates the handling to the implementation, but if
-    /// it causes a <see cref="RuntimeBinderException"/> this will catch it and return false
+    /// it causes a <see cref="Exception"/> this will catch it and return false
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public abstract class DynamicDispatchHandler<T> : ICodeObjectHandler<T>
@@ -16,9 +16,14 @@ namespace CodeDomExt.Generators
             {
                 return DoDynamicHandle(obj, ctx);
             }
-            catch (RuntimeBinderException)
+            catch (Exception ex)
             {
-                return false;
+                if (ex.GetType().Name == "RuntimeBinderException")
+                {
+                    return false;
+                }
+
+                throw;
             }
         }
 

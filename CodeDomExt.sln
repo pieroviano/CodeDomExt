@@ -1,13 +1,23 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27428.2043
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.34928.147
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeDomExt", "CodeDomExt\CodeDomExt.csproj", "{FFAC55C2-6BA9-41D7-8E36-5298C1B5D24B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeDomExt", "CodeDomExt\CodeDomExt.csproj", "{FFAC55C2-6BA9-41D7-8E36-5298C1B5D24B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeDomExtTests", "CodeDomExtTests\CodeDomExtTests.csproj", "{B0527D52-868B-4600-A05E-9CC4DB5495EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeDomExtTests", "CodeDomExtTests\CodeDomExtTests.csproj", "{B0527D52-868B-4600-A05E-9CC4DB5495EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeDomExt.Helpers", "CodeDomExt.Helpers\CodeDomExt.Helpers.csproj", "{EDBD661B-9C26-4281-BCB7-302F954F0923}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeDomExt.Helpers", "CodeDomExt.Helpers\CodeDomExt.Helpers.csproj", "{EDBD661B-9C26-4281-BCB7-302F954F0923}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{860EA250-5840-49B1-B87E-E3D357CE123F}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		Directory.Build.Props = Directory.Build.Props
+		Directory.NuGet.json = Directory.NuGet.json
+		Directory.NuGet.props = Directory.NuGet.props
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{986BC3CB-919E-45E4-BB06-A753B6FCF794}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,6 +40,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B0527D52-868B-4600-A05E-9CC4DB5495EC} = {986BC3CB-919E-45E4-BB06-A753B6FCF794}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {4C304834-E393-4464-A35B-95950CA2C349}

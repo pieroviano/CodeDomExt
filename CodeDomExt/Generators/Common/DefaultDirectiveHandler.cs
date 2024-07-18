@@ -1,6 +1,5 @@
 ﻿using System;
 using System.CodeDom;
-using System.Runtime.Remoting.Messaging;
 
 namespace CodeDomExt.Generators.Common
 {
@@ -16,7 +15,7 @@ namespace CodeDomExt.Generators.Common
         /// <inheritdoc />
         protected override bool DoDynamicHandle(CodeDirective obj, Context ctx)
         {
-            return HandleDynamic(obj as dynamic, ctx);
+            return HandleDynamic(obj as CodeRegionDirective, ctx);
         }
 
         private bool HandleDynamic(CodeRegionDirective obj, Context ctx)

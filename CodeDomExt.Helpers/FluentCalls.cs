@@ -191,7 +191,11 @@ namespace CodeDomExt.Helpers
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
+#if NET35 || NET40
+        public static IList<CodeExpression> GetFluentCalls(this CodeExpression expression)
+#else
         public static IReadOnlyList<CodeExpression> GetFluentCalls(this CodeExpression expression)
+#endif
         {
             return GetFluentCallsImpl(expression).Reverse().ToList();
         }

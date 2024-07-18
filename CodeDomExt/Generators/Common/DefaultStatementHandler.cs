@@ -43,7 +43,7 @@ namespace CodeDomExt.Generators.Common
         /// <inheritdoc cref="ICodeObjectHandler{T}.Handle"/>
         protected override bool DoDynamicHandle(CodeStatement obj, Context ctx)
         {
-            return HandleDynamic(obj as dynamic, ctx);
+            return HandleDynamic(obj as CodeCommentStatement, ctx);
         }
 
         private bool HandleDynamic(CodeCommentStatement obj, Context ctx)
