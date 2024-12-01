@@ -1361,6 +1361,11 @@
         "Name": "CoreLibrary.TypedBackgroundWorker.Test\\CoreLibrary.TypedBackgroundWorker.Test.csproj",
         "Project": "Net4x.$(MSBuildProjectName)",
         "PackageReferences": null
+      },
+      {
+        "Name": "CoreLibrary.Interfaces\\CoreLibrary.Interfaces.General.csproj",
+        "Project": "Net4x.CoreLibrary.Interfaces.General.Common",
+        "PackageReferences": null
       }
     ]
   },
